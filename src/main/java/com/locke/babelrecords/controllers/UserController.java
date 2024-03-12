@@ -4,6 +4,7 @@ import com.locke.babelrecords.exceptions.InvalidPasswordException;
 import com.locke.babelrecords.exceptions.ItemNotFoundException;
 import com.locke.babelrecords.exceptions.UserAlreadyExistsException;
 import com.locke.babelrecords.models.SpecField;
+import com.locke.babelrecords.models.SpecFile;
 import com.locke.babelrecords.models.User;
 import com.locke.babelrecords.services.FileService;
 import com.locke.babelrecords.services.UserService;
@@ -64,9 +65,15 @@ public class UserController {
         return new ResponseEntity<>(tokenRes, HttpStatus.OK);
     }
 
+    @GetMapping("{id}/spec-files")
+    @ResponseStatus(HttpStatus.OK)
+    public List<SpecFile> getUserSpecFiles(@PathVariable("id") String userId) {
+        return fileService.getUserSpecFiles(userId);
+    }
+
     @PostMapping(value = "{id}/spec-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> postSpecFile(@PathParam("ids") String userId, @RequestPart("file") MultipartFile specFile, @RequestParam String specName) throws IOException {
+    public ResponseEntity<?> postSpecFile(@PathVariable("id") String userId, @RequestPart("file") MultipartFile specFile, @RequestParam String specName) throws IOException {
         List<SpecField> parsedFile = fileService.parseSpecFile(specFile);
         fileService.uploadSpecFile(userId, specName, parsedFile);
         return new ResponseEntity<>(parsedFile, HttpStatus.CREATED);

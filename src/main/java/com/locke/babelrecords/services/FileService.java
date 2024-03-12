@@ -32,6 +32,11 @@ public class FileService {
     }
 
     public void uploadSpecFile(String userId, String name, List<SpecField> specs) {
+        System.out.println(userId);
         this.specFileRepository.save(new SpecFile(userId, name, specs));
+    }
+
+    public List<SpecFile> getUserSpecFiles(String userId) {
+        return specFileRepository.findByUserId(userId);
     }
 }
