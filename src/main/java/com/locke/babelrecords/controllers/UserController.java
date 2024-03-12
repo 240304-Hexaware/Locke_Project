@@ -1,14 +1,18 @@
 package com.locke.babelrecords.controllers;
 
+import com.locke.babelrecords.exceptions.InvalidPasswordException;
 import com.locke.babelrecords.exceptions.ItemNotFoundException;
 import com.locke.babelrecords.exceptions.UserAlreadyExistsException;
 import com.locke.babelrecords.models.User;
 import com.locke.babelrecords.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/users")
@@ -42,6 +46,16 @@ public class UserController {
     public void postUser(@RequestBody User user) throws UserAlreadyExistsException {
        userService.insertUser(user);
     }
+
+    @PostMapping("/login")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> login(@RequestBody User user) throws ItemNotFoundException, InvalidPasswordException {
+        User foundUser = userService.findByUserName(user.getUserName());
+        Map<String, String> tokenRes = new HashMap<>();
+        tokenRes.put("token", userService.validateCredentials(user.getPassword(), foundUser));
+        return new ResponseEntity<>(tokenRes, HttpStatus.OK);
+    }
+
     @ExceptionHandler(ItemNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String queryItemNotFound(ItemNotFoundException e) {
@@ -51,4 +65,8 @@ public class UserController {
     @ExceptionHandler(UserAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public String userAlreadyExists(UserAlreadyExistsException e) { return e.getMessage(); }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String invalidPassword(InvalidPasswordException e) { return e.getMessage(); }
 }
