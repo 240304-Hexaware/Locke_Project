@@ -51,40 +51,4 @@ public class UserService {
         user.setPassword(encodedPassword);
         userRep.save(user);
     }
-
-    public String loginAndGetToken(User user, String password) throws InvalidPasswordException {
-        String token = validateCredentials(password, user);
-        userRep
-                .findById(user.getId())
-                .orElseThrow()
-                .setLoginToken(token);
-
-        return token;
-    }
-
-    public String getLoginToken(String id) throws ItemNotFoundException {
-        return userRep.findById(id).orElseThrow().getLoginToken();
-    }
-    public String validateCredentials(String password, User User) throws InvalidPasswordException {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        if (passwordEncoder.matches(password, User.getPassword())) {
-            try {
-                KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-                kpg.initialize(1024);
-                KeyPair keyPair = kpg.generateKeyPair();
-
-                RSAPublicKey rsaPublicKey = (RSAPublicKey) keyPair.getPublic();
-                RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) keyPair.getPrivate();
-                Algorithm algorithm = Algorithm.RSA256(rsaPublicKey, rsaPrivateKey);
-
-                return JWT.create()
-                        .withIssuer("Locke")
-                        .sign(algorithm);
-            } catch (JWTCreationException | NoSuchAlgorithmException e) {
-                return e.getMessage();
-            }
-        }
-
-        throw new InvalidPasswordException("Passwords do not match.");
-    }
 }

@@ -4,6 +4,7 @@ import com.locke.babelrecords.exceptions.InvalidPasswordException;
 import com.locke.babelrecords.exceptions.ItemNotFoundException;
 import com.locke.babelrecords.exceptions.ItemAlreadyExistsException;
 import com.locke.babelrecords.models.User;
+import com.locke.babelrecords.services.AuthenticationService;
 import com.locke.babelrecords.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,10 +20,12 @@ import java.util.Map;
 @RequestMapping("api/v1/users")
 public class UserController {
     private UserService userService;
+    private AuthenticationService authenticationService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, AuthenticationService authenticationService) {
         this.userService = userService;
+        this.authenticationService = authenticationService;
     }
 
     @GetMapping("/id/{id}")
@@ -54,7 +57,7 @@ public class UserController {
         User foundUser = userService.findByUserName(user.getUserName());
         Map<String, String> tokenRes = new HashMap<>();
         tokenRes.put("token",
-                userService.loginAndGetToken(foundUser, user.getPassword())
+                authenticationService.loginAndGetToken(foundUser, user.getPassword())
         );
         return new ResponseEntity<>(tokenRes, HttpStatus.OK);
     }
