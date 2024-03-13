@@ -80,21 +80,19 @@ public class FileService {
         }
     }
 
-    /*
-    TODO: Everything
-     */
-    public void uploadFlatFile(String userId, String name, MultipartFile file, String specFileId) throws ItemNotFoundException, ItemAlreadyExistsException, IOException {
-        if(parsedFileRepository.findByName(name).isEmpty()) {
-            SpecFile specs = specFileRepository.findById(specFileId).orElseThrow();
-            List<String> extractedFields = readFields(file, specs.getSpecs());
-            ParsedFile parsedFile = buildFile(userId, name, extractedFields, specs.getSpecs());
-            this.parsedFileRepository.save(parsedFile);
-        } else {
-            throw new ItemAlreadyExistsException("There is already a flat file with that name.");
+    public void uploadFlatFile(String userId, String name, MultipartFile file, String specFileId) throws ItemAlreadyExistsException, IOException {
+        try {
+            if(parsedFileRepository.findByName(name).isEmpty()) {
+                SpecFile specs = specFileRepository.findById(specFileId).orElseThrow();
+                List<String> extractedFields = readFields(file, specs.getSpecs());
+                ParsedFile parsedFile = buildFile(userId, name, extractedFields, specs.getSpecs());
+                this.parsedFileRepository.save(parsedFile);
+            } else {
+                throw new ItemAlreadyExistsException("There is already a flat file with that name.");
+            }
+        } catch (IOException e ) {
+            throw new IOException("Could not parse flat file");
         }
-    }
-
-    public void uploadParsedFlatFile() {
 
     }
 
@@ -102,7 +100,15 @@ public class FileService {
         return specFileRepository.findByUserId(userId);
     }
 
+    public List<ParsedFile> getUserParsedFiles(String userId) {
+        return parsedFileRepository.findByUserId(userId);
+    }
+
     public SpecFile getSpecFileById(String id) throws ItemNotFoundException {
         return specFileRepository.findById(id).orElseThrow( () -> new ItemNotFoundException("Spec File Not Found."));
+    }
+
+    public ParsedFile getParsedFileById(String id) throws ItemNotFoundException {
+        return parsedFileRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Flat File Not Found."));
     }
 }
