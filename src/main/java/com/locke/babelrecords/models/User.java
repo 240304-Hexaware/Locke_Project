@@ -17,6 +17,9 @@ public class User {
     @Field(name = "password")
     private String password;
 
+    @Field(name = "loginToken")
+    private String loginToken;
+
     @Field(name = "role")
     private String role;
 
@@ -56,5 +59,21 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getLoginToken() {
+        return loginToken;
+    }
+
+    public void setLoginToken(String loginToken) {
+        this.loginToken = loginToken;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

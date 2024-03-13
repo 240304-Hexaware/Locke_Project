@@ -5,7 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.locke.babelrecords.exceptions.InvalidPasswordException;
 import com.locke.babelrecords.exceptions.ItemNotFoundException;
-import com.locke.babelrecords.exceptions.UserAlreadyExistsException;
+import com.locke.babelrecords.exceptions.ItemAlreadyExistsException;
 import com.locke.babelrecords.models.User;
 import com.locke.babelrecords.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,10 +40,10 @@ public class UserService {
     public List<User> findAll() {
         return userRep.findAll();
     }
-    public void insertUser(User user) throws UserAlreadyExistsException {
+    public void insertUser(User user) throws ItemAlreadyExistsException {
         Optional<User> existingUser = userRep.findByUserName(user.getUserName());
         if (existingUser.isPresent()) {
-            throw new UserAlreadyExistsException("User already exists.");
+            throw new ItemAlreadyExistsException("User already exists.");
         }
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
@@ -52,6 +52,19 @@ public class UserService {
         userRep.save(user);
     }
 
+    public String loginAndGetToken(User user, String password) throws InvalidPasswordException {
+        String token = validateCredentials(password, user);
+        userRep
+                .findById(user.getId())
+                .orElseThrow()
+                .setLoginToken(token);
+
+        return token;
+    }
+
+    public String getLoginToken(String id) throws ItemNotFoundException {
+        return userRep.findById(id).orElseThrow().getLoginToken();
+    }
     public String validateCredentials(String password, User User) throws InvalidPasswordException {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         if (passwordEncoder.matches(password, User.getPassword())) {

@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class SpecField {
     private String name;
     private int start;
+
+    private int end;
+
     private String dataType;
 
     public SpecField() {
@@ -23,6 +26,14 @@ public class SpecField {
 
     public int getStart() {
         return start;
+    }
+
+    public int getEnd() {
+        return end;
+    }
+
+    public void setEnd(int end) {
+        this.end = end;
     }
 
     public String getDataType() {
