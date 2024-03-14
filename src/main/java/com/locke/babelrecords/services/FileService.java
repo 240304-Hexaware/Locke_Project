@@ -45,10 +45,10 @@ public class FileService {
         List<String> fields = new ArrayList<>();
         List<Integer> starts = specs.stream().map(SpecField::getStart).toList();
         List<Integer> ends = specs.stream().map(SpecField::getEnd).toList();
+        char[] data = new String(dataFile.getBytes(), StandardCharsets.UTF_8).toCharArray();
 
         for (int fieldIndex = 0; fieldIndex < starts.size(); fieldIndex++) {
             StringBuilder fieldBuilder = new StringBuilder();
-            char[] data = new String(dataFile.getBytes(), StandardCharsets.UTF_8).toCharArray();
 
             for(int i = starts.get(fieldIndex); i <= ends.get(fieldIndex); i++) {
                 fieldBuilder.append(data[i]);
@@ -58,6 +58,11 @@ public class FileService {
         }
 
         return fields;
+    }
+
+    private int calculateItemSize(List<SpecField> specs) {
+        // Reduce will return the last element
+        return specs.stream().map(SpecField::getEnd).reduce((first, second) -> second).get() + 1;
     }
 
     public ParsedFile buildFile(String userId, String name, List<String> fields, List<SpecField> specs) {
