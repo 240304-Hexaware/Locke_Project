@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Document("parsedFiles")
@@ -19,15 +20,15 @@ public class ParsedFile {
     private String name;
 
     @Field(name = "fields")
-    private List<FileField> fields;
+    private List<List<FileField>> fields;
 
     public ParsedFile() {
     }
 
-    public ParsedFile(String userId, String name, List<FileField> fields) {
+    public ParsedFile(String userId, String name) {
         this.userId = userId;
         this.name = name;
-        this.fields = fields;
+        this.fields = new ArrayList<>();
     }
 
     public String getId() {
@@ -54,12 +55,8 @@ public class ParsedFile {
         this.name = name;
     }
 
-    public List<FileField> getFields() {
-        return fields;
-    }
-
-    public void setFields(List<FileField> fields) {
-        this.fields = fields;
+    public void addRecord(List<FileField> record) {
+        this.fields.add(record);
     }
 
     @Override

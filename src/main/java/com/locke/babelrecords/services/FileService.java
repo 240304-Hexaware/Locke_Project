@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -41,11 +42,10 @@ public class FileService {
         return new ArrayList<SpecField>(map.values());
     }
 
-    public List<String> readFields(MultipartFile dataFile, List<SpecField> specs) throws IOException {
+    public List<String> readFields(char[] data, List<SpecField> specs) throws IOException {
         List<String> fields = new ArrayList<>();
         List<Integer> starts = specs.stream().map(SpecField::getStart).toList();
         List<Integer> ends = specs.stream().map(SpecField::getEnd).toList();
-        char[] data = new String(dataFile.getBytes(), StandardCharsets.UTF_8).toCharArray();
 
         for (int fieldIndex = 0; fieldIndex < starts.size(); fieldIndex++) {
             StringBuilder fieldBuilder = new StringBuilder();
@@ -65,13 +65,29 @@ public class FileService {
         return specs.stream().map(SpecField::getEnd).reduce((first, second) -> second).get() + 1;
     }
 
-    public ParsedFile buildFile(String userId, String name, List<String> fields, List<SpecField> specs) {
+    public List<FileField> buildRecord(List<String> fields, List<SpecField> specs) {
         List<FileField> mergedFields = new ArrayList<>();
         for (int i = 0; i < fields.size(); i++) {
             mergedFields.add(new FileField(specs.get(i).getName(), fields.get(i), specs.get(i).getDataType()));
         }
 
-        return new ParsedFile(userId, name, mergedFields);
+        return mergedFields;
+    }
+
+    public ParsedFile buildParsedFile(MultipartFile file, List<SpecField> specs, String userId, String fileName) throws IOException {
+        char[] data = new String(file.getBytes(), StandardCharsets.UTF_8).toCharArray();
+        int recordSize = calculateItemSize(specs);
+        int numRecords = data.length / recordSize;
+
+        ParsedFile parsedFile = new ParsedFile(userId, fileName);
+        for (int i = 0; i < numRecords; i++) {
+            List<String> extractedFields = readFields(Arrays.copyOfRange(data, (i * recordSize), recordSize + (i * recordSize)), specs);
+            List<FileField> record = buildRecord(extractedFields, specs);
+
+            parsedFile.addRecord(record);
+        }
+
+        return parsedFile;
     }
 
     public List<SpecFile> findAllSpecFiles() {
@@ -88,9 +104,9 @@ public class FileService {
     public void uploadFlatFile(String userId, String name, MultipartFile file, String specFileId) throws ItemAlreadyExistsException, IOException {
         try {
             if(parsedFileRepository.findByName(name).isEmpty()) {
+                char[] data = new String(file.getBytes(), StandardCharsets.UTF_8).toCharArray();
                 SpecFile specs = specFileRepository.findById(specFileId).orElseThrow();
-                List<String> extractedFields = readFields(file, specs.getSpecs());
-                ParsedFile parsedFile = buildFile(userId, name, extractedFields, specs.getSpecs());
+                ParsedFile parsedFile = buildParsedFile(file, specs.getSpecs(), userId, name);
                 this.parsedFileRepository.save(parsedFile);
             } else {
                 throw new ItemAlreadyExistsException("There is already a flat file with that name.");
