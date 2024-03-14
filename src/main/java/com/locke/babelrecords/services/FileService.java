@@ -4,10 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.locke.babelrecords.exceptions.ItemAlreadyExistsException;
 import com.locke.babelrecords.exceptions.ItemNotFoundException;
-import com.locke.babelrecords.models.FileField;
-import com.locke.babelrecords.models.ParsedFile;
-import com.locke.babelrecords.models.SpecField;
-import com.locke.babelrecords.models.SpecFile;
+import com.locke.babelrecords.models.*;
+import com.locke.babelrecords.repositories.MetaTagRepository;
 import com.locke.babelrecords.repositories.ParsedFileRepository;
 import com.locke.babelrecords.repositories.SpecFileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +23,13 @@ import java.util.List;
 public class FileService {
     private SpecFileRepository specFileRepository;
     private ParsedFileRepository parsedFileRepository;
+    private MetaTagRepository metaTagRepository;
 
     @Autowired
-    public FileService(SpecFileRepository specFileRepository, ParsedFileRepository parsedFileRepository) {
+    public FileService(SpecFileRepository specFileRepository, ParsedFileRepository parsedFileRepository, MetaTagRepository metaTagRepository) {
         this.specFileRepository = specFileRepository;
         this.parsedFileRepository = parsedFileRepository;
+        this.metaTagRepository = metaTagRepository;
     }
     public List<SpecField> parseSpecFile(MultipartFile specFile) throws IOException {
         LinkedHashMap<String, SpecField> map = new ObjectMapper()
@@ -101,12 +101,19 @@ public class FileService {
         }
     }
 
+    public void uploadMetaDate(MultipartFile file, SpecFile specs, String userId, String filename, String specFileId) throws IOException{
+        char[] data = new String(file.getBytes(), StandardCharsets.UTF_8).toCharArray();
+        int recordSize = calculateItemSize(specs.getSpecs());
+        int numRecords = data.length / recordSize;
+        this.metaTagRepository.save(new MetaTag(userId, filename, specFileId, numRecords));
+    }
     public void uploadFlatFile(String userId, String name, MultipartFile file, String specFileId) throws ItemAlreadyExistsException, IOException {
         try {
             if(parsedFileRepository.findByName(name).isEmpty()) {
-                char[] data = new String(file.getBytes(), StandardCharsets.UTF_8).toCharArray();
                 SpecFile specs = specFileRepository.findById(specFileId).orElseThrow();
                 ParsedFile parsedFile = buildParsedFile(file, specs.getSpecs(), userId, name);
+
+                uploadMetaDate(file, specs, userId, name, specFileId);
                 this.parsedFileRepository.save(parsedFile);
             } else {
                 throw new ItemAlreadyExistsException("There is already a flat file with that name.");
