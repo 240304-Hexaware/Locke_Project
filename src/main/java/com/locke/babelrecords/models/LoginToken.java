@@ -1,5 +1,6 @@
 package com.locke.babelrecords.models;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -8,11 +9,10 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Document("loginTokens")
-@EnableMongoAuditing()
 public class LoginToken {
     @MongoId(FieldType.OBJECT_ID)
     private String id;
@@ -22,14 +22,14 @@ public class LoginToken {
     @Field(name = "token")
     private String token;
 
-    @Indexed(name = "deleteAt", expireAfterSeconds = 30)
+    @Indexed(expireAfterSeconds = 30)
     @CreatedDate
-    private LocalTime createdAt;
+    private Date createdAt;
 
     public LoginToken(String userId, String token) {
         this.userId = userId;
         this.token = token;
-        this.createdAt = LocalTime.now();
+        // this.deleteAt = LocalDateTime.now().plusSeconds(30);
     }
 
     public String getUserId() {

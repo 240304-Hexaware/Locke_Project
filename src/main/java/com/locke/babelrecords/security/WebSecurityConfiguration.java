@@ -13,11 +13,12 @@ public class WebSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChair(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests( auth -> auth
-                .requestMatchers("/api/v1/**").permitAll())
-                .csrf(AbstractHttpConfigurer::disable);
-
-        return http.build();
-
+        return http
+                .authorizeHttpRequests( auth -> auth
+                    .requestMatchers("/api/v1/**")
+                        .permitAll()
+                )
+                .csrf(AbstractHttpConfigurer::disable)
+                .build();
     }
 }
