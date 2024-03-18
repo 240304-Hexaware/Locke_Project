@@ -2,20 +2,19 @@ package com.locke.babelrecords.controllers;
 
 import com.locke.babelrecords.exceptions.InvalidPasswordException;
 import com.locke.babelrecords.exceptions.ItemNotFoundException;
-import com.locke.babelrecords.exceptions.ItemAlreadyExistsException;
+import com.locke.babelrecords.exceptions.UserAlreadyExists;
+import com.locke.babelrecords.models.FileField;
 import com.locke.babelrecords.models.LoginToken;
 import com.locke.babelrecords.models.User;
 import com.locke.babelrecords.services.AuthenticationService;
 import com.locke.babelrecords.services.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/users")
@@ -24,14 +23,14 @@ public class UserController {
   private AuthenticationService authenticationService;
 
   @Autowired
-  public UserController( UserService userService, AuthenticationService authenticationService ) {
+  public UserController(UserService userService, AuthenticationService authenticationService) {
     this.userService = userService;
     this.authenticationService = authenticationService;
   }
 
   @GetMapping("/id/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public User getById( @PathVariable String id ) throws ItemNotFoundException {
+  public User getById(@PathVariable String id) throws ItemNotFoundException {
     return userService.findById(id);
   }
 
@@ -43,8 +42,14 @@ public class UserController {
 
   @GetMapping("/username/{username}")
   @ResponseStatus(HttpStatus.OK)
-  public User getByUserName( @PathVariable String username ) throws ItemNotFoundException {
+  public User getByUserName(@PathVariable String username) throws ItemNotFoundException {
     return userService.findByUserName(username);
+  }
+
+  @GetMapping("/id/{id}/records")
+  @ResponseStatus(HttpStatus.OK)
+  public List<List<FileField>> getUserRecords(@PathVariable("id") String userId) {
+    return userService.getUserRecords(userId);
   }
 
   @GetMapping("")
@@ -55,43 +60,41 @@ public class UserController {
 
   @PostMapping("")
   @ResponseStatus(HttpStatus.OK)
-  public void postUser( @RequestBody User user ) throws ItemAlreadyExistsException {
+  public void postUser(@RequestBody User user) throws UserAlreadyExists {
     userService.insertUser(user);
   }
 
   @PostMapping("/login")
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<?> login( @RequestBody User user ) throws ItemNotFoundException, InvalidPasswordException {
-    User foundUser = userService.findByUserName(user.getUserName());
-    Map<String, String> tokenRes = new HashMap<>();
-    tokenRes.put("token",
-        authenticationService.loginAndGetToken(foundUser, user.getPassword())
-    );
-    return new ResponseEntity<>(tokenRes, HttpStatus.OK);
+  public void login(@RequestBody User user, HttpServletResponse response) throws ItemNotFoundException, InvalidPasswordException {
+    User foundUser = userService.findByUserName(user.getUsername());
+    String token = authenticationService.loginAndGetToken(foundUser, user.getPassword());
+
+    response.addHeader("AUTHORIZATION", "bearer " + token);
   }
 
 
   @ExceptionHandler(ItemNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  public String queryItemNotFound( ItemNotFoundException e ) {
+  public String queryItemNotFound(ItemNotFoundException e) {
     return e.getMessage();
   }
 
-  @ExceptionHandler(ItemAlreadyExistsException.class)
+  @ExceptionHandler(UserAlreadyExists.class)
   @ResponseStatus(HttpStatus.CONFLICT)
-  public String userAlreadyExists( ItemAlreadyExistsException e ) {
+  public String userAlreadyExists(UserAlreadyExists e) {
     return e.getMessage();
   }
 
   @ExceptionHandler(InvalidPasswordException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String invalidPassword( InvalidPasswordException e ) {
+  public String invalidPassword(InvalidPasswordException e) {
     return e.getMessage();
   }
 
   @ExceptionHandler(IOException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String cannotParseFile( IOException e ) {
+  public String cannotParseFile(IOException e) {
     return "Could not parse file.";
   }
 }

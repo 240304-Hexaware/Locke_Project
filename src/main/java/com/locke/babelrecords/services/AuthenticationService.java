@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.locke.babelrecords.exceptions.InvalidPasswordException;
 import com.locke.babelrecords.exceptions.ItemNotFoundException;
+import com.locke.babelrecords.exceptions.UserNotFoundException;
 import com.locke.babelrecords.models.LoginToken;
 import com.locke.babelrecords.models.User;
 import com.locke.babelrecords.repositories.LoginTokenRepository;
@@ -24,7 +25,7 @@ public class AuthenticationService {
   private UserRepository userRepository;
   private LoginTokenRepository loginTokenRepository;
 
-  public AuthenticationService( UserRepository userRepository, LoginTokenRepository loginTokenRepository ) {
+  public AuthenticationService(UserRepository userRepository, LoginTokenRepository loginTokenRepository) {
     this.userRepository = userRepository;
     this.loginTokenRepository = loginTokenRepository;
   }
@@ -33,17 +34,17 @@ public class AuthenticationService {
     return loginTokenRepository.findByCreatedAtExists(true);
   }
 
-  public String loginAndGetToken( User user, String password ) throws InvalidPasswordException {
+  public String loginAndGetToken(User user, String password) throws InvalidPasswordException {
     String token = validateCredentials(password, user);
     loginTokenRepository.save(new LoginToken(user.getId(), token));
     return token;
   }
 
-  public String getLoginToken( String id ) throws ItemNotFoundException {
-    return userRepository.findById(id).orElseThrow().getLoginToken();
+  public String getLoginToken(String id) throws ItemNotFoundException {
+    return loginTokenRepository.findByUserId(id).orElseThrow(() -> new ItemNotFoundException("Token not found")).getToken();
   }
 
-  public String validateCredentials( String password, User User ) throws InvalidPasswordException {
+  public String validateCredentials(String password, User User) throws InvalidPasswordException {
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     if ( passwordEncoder.matches(password, User.getPassword()) ) {
       try {
@@ -66,4 +67,7 @@ public class AuthenticationService {
     throw new InvalidPasswordException("Passwords do not match.");
   }
 
+  public boolean isAuthorized(String userId, String token) throws UserNotFoundException {
+    return loginTokenRepository.findByUserId(userId).orElseThrow(UserNotFoundException::new).getToken().equals(token);
+  }
 }
