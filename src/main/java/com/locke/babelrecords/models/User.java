@@ -1,10 +1,13 @@
 package com.locke.babelrecords.models;
 
 import com.locke.babelrecords.exceptions.InvalidRoleException;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
+
+import java.util.Date;
 
 @Document("users")
 public class User {
@@ -17,11 +20,12 @@ public class User {
   @Field(name = "password")
   private String password;
 
-  @Field(name = "loginToken")
-  private String loginToken;
-
   @Field(name = "role")
   private String role;
+
+  @Field(name = "createdAt")
+  @CreatedDate
+  private Date createdAt;
 
   public User() {
   }
@@ -63,6 +67,14 @@ public class User {
 
   public String getRole() {
     return role;
+  }
+
+  public Date getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(Date createdAt) {
+    this.createdAt = createdAt;
   }
 
   public void setRole(String role) throws InvalidRoleException {

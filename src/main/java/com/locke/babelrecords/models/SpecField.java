@@ -4,60 +4,70 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties
 public class SpecField {
-    private String name;
-    private int start;
+  private String name;
+  private int start;
 
-    private int end;
+  private int end;
 
-    private String dataType;
+  private String dataType;
 
-    public SpecField() {
-    }
+  private String type;
 
-    public SpecField(String name, int start, String dataType) {
-        this.name = name;
-        this.start = start;
-        this.dataType = dataType;
-    }
+  public SpecField() {
+  }
 
-    public String getName() {
-        return name;
-    }
+  public SpecField(String name, int start, String dataType) {
+    this.name = name;
+    this.start = start;
+    this.dataType = dataType;
+  }
 
-    public int getStart() {
-        return start;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public int getEnd() {
-        return end;
-    }
+  public int getStart() {
+    return start;
+  }
 
-    public void setEnd(int end) {
-        this.end = end;
-    }
+  public int getEnd() {
+    return end;
+  }
 
-    public String getDataType() {
-        return dataType;
-    }
+  public void setEnd(int end) {
+    this.end = end;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public String getDataType() {
+    return dataType;
+  }
 
-    public void setStart(int start) {
-        this.start = start;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
-    }
+  public void setStart(int start) {
+    this.start = start;
+  }
 
-    @Override
-    public String toString() {
-        return "SpecField{" +
-                "name='" + name + '\'' +
-                ", start=" + start +
-                ", dataType='" + dataType + '\'' +
-                '}';
-    }
+  public void setDataType(String dataType) {
+    this.dataType = dataType;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  @Override
+  public String toString() {
+    return "SpecField{" +
+        "name='" + name + '\'' +
+        ", start=" + start +
+        ", dataType='" + dataType + '\'' +
+        '}';
+  }
 }

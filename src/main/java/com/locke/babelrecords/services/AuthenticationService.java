@@ -1,8 +1,11 @@
 package com.locke.babelrecords.services;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.locke.babelrecords.exceptions.InvalidPasswordException;
 import com.locke.babelrecords.exceptions.ItemNotFoundException;
 import com.locke.babelrecords.exceptions.UserNotFoundException;
@@ -18,6 +21,7 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -67,7 +71,26 @@ public class AuthenticationService {
     throw new InvalidPasswordException("Passwords do not match.");
   }
 
-  public boolean isAuthorized(String userId, String token) throws UserNotFoundException {
-    return loginTokenRepository.findByUserId(userId).orElseThrow(UserNotFoundException::new).getToken().equals(token);
+  public boolean isAuthorized(String userId, String token) throws UserNotFoundException, NoSuchAlgorithmException {
+    String storedToken = loginTokenRepository.findByUserId(userId).orElseThrow(UserNotFoundException::new).getToken();
+    String splitToken = token.split(" ")[1];
+
+    KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+    kpg.initialize(1024);
+    KeyPair keyPair = kpg.generateKeyPair();
+
+    try {
+      Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) keyPair.getPublic(), (RSAPrivateKey) keyPair.getPrivate());
+      JWTVerifier jwtVerifier = JWT.require(algorithm)
+          .withIssuer("Locke")
+          .build();
+
+      DecodedJWT decodedJWT = jwtVerifier.verify(splitToken);
+      return true;
+    } catch ( JWTVerificationException e ) {
+      // ToDo: this
+    }
+
+    return false;
   }
 }

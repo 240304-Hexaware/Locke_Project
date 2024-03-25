@@ -1,8 +1,6 @@
 package com.locke.babelrecords.controllers;
 
-import com.locke.babelrecords.exceptions.InvalidPasswordException;
-import com.locke.babelrecords.exceptions.ItemNotFoundException;
-import com.locke.babelrecords.exceptions.UserAlreadyExists;
+import com.locke.babelrecords.exceptions.*;
 import com.locke.babelrecords.models.FileField;
 import com.locke.babelrecords.models.LoginToken;
 import com.locke.babelrecords.models.User;
@@ -17,6 +15,11 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
+@CrossOrigin(
+    origins = "http://localhost:4200",
+    allowCredentials = "true",
+    exposedHeaders = "AUTHORIZATION"
+)
 @RequestMapping("api/v1/users")
 public class UserController {
   private UserService userService;
@@ -52,6 +55,24 @@ public class UserController {
     return userService.getUserRecords(userId);
   }
 
+  @PutMapping("")
+  @ResponseStatus(HttpStatus.OK)
+  public User updateUser(@RequestBody User updatedUser) throws UserNotFoundException {
+    return userService.updateUser(updatedUser);
+  }
+
+  @DeleteMapping("/{id}")
+  @ResponseStatus(HttpStatus.OK)
+  public void deleteUser(@PathVariable("id") String userId) {
+    userService.deleteUser(userId);
+  }
+
+  @PutMapping("/role/{id}/{role}")
+  @ResponseStatus(HttpStatus.OK)
+  public void changeUserRole(@PathVariable("id") String userId, @PathVariable("role") String newRole) throws UserNotFoundException, InvalidRoleException {
+    userService.changeUserRole(userId, newRole);
+  }
+
   @GetMapping("")
   @ResponseStatus(HttpStatus.OK)
   public List<User> getAll() {
@@ -66,11 +87,13 @@ public class UserController {
 
   @PostMapping("/login")
   @ResponseStatus(HttpStatus.OK)
-  public void login(@RequestBody User user, HttpServletResponse response) throws ItemNotFoundException, InvalidPasswordException {
+  public User login(@RequestBody User user, HttpServletResponse response) throws ItemNotFoundException, InvalidPasswordException {
     User foundUser = userService.findByUserName(user.getUsername());
     String token = authenticationService.loginAndGetToken(foundUser, user.getPassword());
 
     response.addHeader("AUTHORIZATION", "bearer " + token);
+    foundUser.setPassword("");
+    return foundUser;
   }
 
 

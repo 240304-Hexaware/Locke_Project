@@ -104,8 +104,12 @@ public class FileService {
   }
 
   public void uploadFlatFile(String userId, String name, MultipartFile file, String specFileId) throws ItemAlreadyExistsException, IOException {
-    Path filepath = Paths.get(System.getProperty("user.dir"), "flatfiles", name);
-    file.transferTo(filepath);
+    try {
+      Path filepath = Paths.get(System.getProperty("user.dir"), "flatfiles", name);
+      file.transferTo(filepath);
+    } catch ( IOException e ) {
+      throw new IOException("Could not write file to disk");
+    }
     try {
       if ( parsedFileRepository.findByName(name).isEmpty() ) {
         SpecFile specs = specFileRepository.findById(specFileId).orElseThrow();

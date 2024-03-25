@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,8 +28,8 @@ public class UserService {
     return userRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Id not found"));
   }
 
-  public User findByUserName(String userName) throws ItemNotFoundException {
-    return userRepository.findByUsername(userName).orElseThrow(() -> new ItemNotFoundException("userName not found"));
+  public User findByUserName(String username) throws ItemNotFoundException {
+    return userRepository.findByUsername(username).orElseThrow(() -> new ItemNotFoundException("username not found"));
   }
 
   public List<User> findAll() {
@@ -49,6 +48,19 @@ public class UserService {
     userRepository.save(user);
   }
 
+  public User updateUser(User updatedUser) throws UserNotFoundException {
+    User prevUser = userRepository.findById(updatedUser.getId()).orElseThrow(UserNotFoundException::new);
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
+    String encodedPassword = encoder.encode(updatedUser.getPassword());
+    updatedUser.setPassword(encodedPassword);
+    userRepository.save(updatedUser);
+    return prevUser;
+  }
+
+  public void deleteUser(String userId) {
+    userRepository.deleteById(userId);
+  }
+
   public List<List<FileField>> getUserRecords(String userId) {
     return parsedFileRepository.findByUserId(userId)
         .stream() // Each parsed file has an array of records
@@ -57,12 +69,10 @@ public class UserService {
         .toList();
   }
 
-  public User changeUserRole(User user, String newRole) throws UserNotFoundException, InvalidRoleException {
-    User foundUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
+  public void changeUserRole(String userId, String newRole) throws UserNotFoundException, InvalidRoleException {
+    User foundUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     foundUser.setRole(newRole);
 
     userRepository.save(foundUser);
-
-    return foundUser;
   }
 }
