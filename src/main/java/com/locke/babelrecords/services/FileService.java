@@ -9,20 +9,21 @@ import com.locke.babelrecords.models.*;
 import com.locke.babelrecords.repositories.MetaTagRepository;
 import com.locke.babelrecords.repositories.ParsedFileRepository;
 import com.locke.babelrecords.repositories.SpecFileRepository;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Service
 public class FileService {
@@ -89,7 +90,8 @@ public class FileService {
   }
 
   public void uploadSpecFile(String userId, String name, List<SpecField> specs) throws ItemAlreadyExistsException {
-    if ( specFileRepository.findByName(name).isEmpty() ) {
+    List<SpecFile> userSpecs = specFileRepository.findByUserId(userId);
+    if ( !userSpecs.stream().map(SpecFile::getName).toList().contains(name) ) {
       this.specFileRepository.save(new SpecFile(userId, name, specs));
     } else {
       throw new ItemAlreadyExistsException("There is already a spec file with that name.");
@@ -105,13 +107,15 @@ public class FileService {
 
   public void uploadFlatFile(String userId, String name, MultipartFile file, String specFileId) throws ItemAlreadyExistsException, IOException {
     try {
-      Path filepath = Paths.get(System.getProperty("user.dir"), "flatfiles", name);
+      Path filepath = Paths.get(System.getProperty("user.dir"), "flatfiles", (userId + "_" + name));
       file.transferTo(filepath);
     } catch ( IOException e ) {
       throw new IOException("Could not write file to disk");
     }
+
+    Optional<ParsedFile> sameNameParsed = parsedFileRepository.findByName(name);
     try {
-      if ( parsedFileRepository.findByName(name).isEmpty() ) {
+      if ( sameNameParsed.isEmpty() || !sameNameParsed.get().getId().equals(userId) ) {
         SpecFile specs = specFileRepository.findById(specFileId).orElseThrow();
         ParsedFile parsedFile = buildParsedFile(file, specs.getSpecs(), userId, name);
 
@@ -132,6 +136,22 @@ public class FileService {
 
   public List<ParsedFile> getUserParsedFiles(String userId) {
     return parsedFileRepository.findByUserId(userId);
+  }
+
+  public List<String> getUserFilePaths(String userId) throws IOException {
+    ArrayList<String> files = new ArrayList<>();
+    try ( Stream<Path> paths = Files.walk(Paths.get(System.getProperty("user.dir"), "flatfiles")) ) {
+      paths
+          .filter(Files::isRegularFile)
+          .filter(path -> path.toString().contains(userId))
+          .forEach(path -> files.add(path.toString().split("_")[1]));
+    }
+    return files;
+  }
+
+  public ByteArrayResource getUserFile(String userId, String filename) throws IOException {
+    Path path = Paths.get(System.getProperty("user.dir"), "flatfiles", (userId + "_" + filename));
+    return new ByteArrayResource(Files.readAllBytes(path));
   }
 
   public SpecFile getSpecFileById(String id) throws ItemNotFoundException {

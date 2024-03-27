@@ -36,7 +36,7 @@ public class UserService {
     return userRepository.findAll();
   }
 
-  public void insertUser(User user) throws UserAlreadyExists {
+  public User insertUser(User user) throws UserAlreadyExists {
     Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
     if ( existingUser.isPresent() ) {
       throw new UserAlreadyExists();
@@ -45,7 +45,7 @@ public class UserService {
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
     String encodedPassword = encoder.encode(user.getPassword());
     user.setPassword(encodedPassword);
-    userRepository.save(user);
+    return userRepository.save(user);
   }
 
   public User updateUser(User updatedUser) throws UserNotFoundException {

@@ -8,7 +8,10 @@ import com.locke.babelrecords.services.AuthenticationService;
 import com.locke.babelrecords.services.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -18,7 +21,7 @@ import java.util.List;
 @CrossOrigin(
     origins = "http://localhost:4200",
     allowCredentials = "true",
-    exposedHeaders = "AUTHORIZATION"
+    exposedHeaders = "Content-Disposition"
 )
 @RequestMapping("api/v1/users")
 public class UserController {
@@ -79,10 +82,10 @@ public class UserController {
     return userService.findAll();
   }
 
-  @PostMapping("")
+  @PostMapping("/register")
   @ResponseStatus(HttpStatus.OK)
-  public void postUser(@RequestBody User user) throws UserAlreadyExists {
-    userService.insertUser(user);
+  public User postUser(@RequestBody User user) throws UserAlreadyExists {
+    return userService.insertUser(user);
   }
 
   @PostMapping("/login")
@@ -90,9 +93,10 @@ public class UserController {
   public User login(@RequestBody User user, HttpServletResponse response) throws ItemNotFoundException, InvalidPasswordException {
     User foundUser = userService.findByUserName(user.getUsername());
     String token = authenticationService.loginAndGetToken(foundUser, user.getPassword());
-
+    response.addHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Content-Disposition");
     response.addHeader("AUTHORIZATION", "bearer " + token);
-    foundUser.setPassword("");
+
+    response.addHeader("Content-Disposition", ContentDisposition.attachment().filename("godstopgivingmeyourhardestbattles").build().toString());
     return foundUser;
   }
 

@@ -1,5 +1,7 @@
 package com.locke.babelrecords.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.locke.babelrecords.exceptions.InvalidRoleException;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -49,6 +51,7 @@ public class User {
     this.username = username;
   }
 
+  @JsonProperty
   public void setPassword(String password) {
     this.password = password;
   }
@@ -61,6 +64,7 @@ public class User {
     return username;
   }
 
+  @JsonIgnore
   public String getPassword() {
     return password;
   }
