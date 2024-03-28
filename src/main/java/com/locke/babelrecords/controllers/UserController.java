@@ -21,7 +21,7 @@ import java.util.List;
 @CrossOrigin(
     origins = "http://localhost:4200",
     allowCredentials = "true",
-    exposedHeaders = "Content-Disposition"
+    exposedHeaders = "Authorization"
 )
 @RequestMapping("api/v1/users")
 public class UserController {
@@ -93,10 +93,8 @@ public class UserController {
   public User login(@RequestBody User user, HttpServletResponse response) throws ItemNotFoundException, InvalidPasswordException {
     User foundUser = userService.findByUserName(user.getUsername());
     String token = authenticationService.loginAndGetToken(foundUser, user.getPassword());
-    response.addHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Content-Disposition");
     response.addHeader("AUTHORIZATION", "bearer " + token);
 
-    response.addHeader("Content-Disposition", ContentDisposition.attachment().filename("godstopgivingmeyourhardestbattles").build().toString());
     return foundUser;
   }
 

@@ -81,14 +81,8 @@ public class FileController {
     response.addHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Content-Disposition");
     response.addHeader("Content-Disposition", ContentDisposition.attachment().filename(filename).build().toString());
     response.setContentLength((int) data.contentLength());
-    response.setContentType(MediaType.APPLICATION_OCTET_STREAM.toString());
-
     return ResponseEntity.ok()
         .contentType(MediaType.APPLICATION_OCTET_STREAM)
-//        .contentLength(data.contentLength())
-//        .header(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Content-Disposition")
-//        .header(HttpHeaders.CONTENT_DISPOSITION,
-//            ContentDisposition.attachment().filename(filename).build().toString())
         .body(data);
   }
 
