@@ -3,6 +3,7 @@ package com.locke.babelrecords.controllers;
 import com.locke.babelrecords.exceptions.*;
 import com.locke.babelrecords.models.FileField;
 import com.locke.babelrecords.models.LoginToken;
+import com.locke.babelrecords.models.Record;
 import com.locke.babelrecords.models.User;
 import com.locke.babelrecords.services.AuthenticationService;
 import com.locke.babelrecords.services.UserService;
@@ -54,7 +55,7 @@ public class UserController {
 
   @GetMapping("/id/{id}/records")
   @ResponseStatus(HttpStatus.OK)
-  public List<List<FileField>> getUserRecords(@PathVariable("id") String userId) {
+  public List<Record> getUserRecords(@PathVariable("id") String userId) {
     return userService.getUserRecords(userId);
   }
 
@@ -85,7 +86,7 @@ public class UserController {
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.OK)
   public User postUser(@RequestBody User user) throws UserAlreadyExists {
-    return userService.insertUser(user);
+    return userService.insertUser(new User(user.getUsername(), user.getPassword(), user.getRole()));
   }
 
   @PostMapping("/login")

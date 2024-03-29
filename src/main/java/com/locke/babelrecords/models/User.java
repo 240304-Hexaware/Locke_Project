@@ -9,7 +9,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Document("users")
 public class User {
@@ -29,18 +31,34 @@ public class User {
   @CreatedDate
   private Date createdAt;
 
+  @Field
+  private List<String> specFileIds;
+
+  @Field
+  private List<String> parsedFileIds;
+
+  @Field
+  private List<String> recordIds;
+
+
   public User() {
   }
 
   public User(String username, String password) {
     this.username = username;
     this.password = password;
+    this.specFileIds = new ArrayList<>();
+    this.parsedFileIds = new ArrayList<>();
+    this.recordIds = new ArrayList<>();
   }
 
-  public User(String id, String username, String password) {
-    this.id = id;
+  public User(String username, String password, String role) {
     this.username = username;
     this.password = password;
+    this.role = role;
+    this.specFileIds = new ArrayList<>();
+    this.parsedFileIds = new ArrayList<>();
+    this.recordIds = new ArrayList<>();
   }
 
   public void setId(String id) {
@@ -79,6 +97,30 @@ public class User {
 
   public void setCreatedAt(Date createdAt) {
     this.createdAt = createdAt;
+  }
+
+  public List<String> getSpecFileIds() {
+    return specFileIds;
+  }
+
+  public void addSpecFile(String specFile) {
+    this.specFileIds.add(specFile);
+  }
+
+  public List<String> getParsedFileIds() {
+    return parsedFileIds;
+  }
+
+  public void addParsedFile(String parsedFile) {
+    this.parsedFileIds.add(parsedFile);
+  }
+
+  public List<String> getRecordIds() {
+    return recordIds;
+  }
+
+  public void addRecords(List<String> records) {
+    this.recordIds.addAll(records);
   }
 
   public void setRole(String role) throws InvalidRoleException {

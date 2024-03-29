@@ -13,22 +13,23 @@ public class ParsedFile {
   @MongoId(FieldType.OBJECT_ID)
   private String id;
 
-  @Field(name = "userId")
-  private String userId;
-
   @Field(name = "name")
   private String name;
 
-  @Field(name = "fields")
-  private List<List<FileField>> fields;
+  @Field(name = "record")
+  private List<String> recordIds;
 
   public ParsedFile() {
   }
 
-  public ParsedFile(String userId, String name) {
-    this.userId = userId;
+  public ParsedFile(String name) {
     this.name = name;
-    this.fields = new ArrayList<>();
+    this.recordIds = new ArrayList<>();
+  }
+
+  public ParsedFile(String name, List<String> recordIds) {
+    this.name = name;
+    this.recordIds = recordIds;
   }
 
   public String getId() {
@@ -39,14 +40,6 @@ public class ParsedFile {
     this.id = id;
   }
 
-  public String getUserId() {
-    return userId;
-  }
-
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
-
   public String getName() {
     return name;
   }
@@ -55,21 +48,24 @@ public class ParsedFile {
     this.name = name;
   }
 
-  public List<List<FileField>> getRecords() {
-    return this.fields;
+  public List<String> getRecordIds() {
+    return this.recordIds;
   }
 
-  public void addRecord(List<FileField> record) {
-    this.fields.add(record);
+  public void setRecordIds(List<String> recordIds) {
+    this.recordIds = recordIds;
+  }
+
+  public void addRecordIds(List<String> recordIds) {
+    this.recordIds.addAll(recordIds);
   }
 
   @Override
   public String toString() {
     return "ParsedFile{" +
         "id='" + id + '\'' +
-        ", userId='" + userId + '\'' +
         ", name='" + name + '\'' +
-        ", fields=" + fields +
+        ", fields=" + recordIds +
         '}';
   }
 }

@@ -5,7 +5,10 @@ import com.locke.babelrecords.exceptions.ItemNotFoundException;
 import com.locke.babelrecords.models.ParsedFile;
 import com.locke.babelrecords.models.SpecField;
 import com.locke.babelrecords.models.SpecFile;
+import com.locke.babelrecords.models.User;
 import com.locke.babelrecords.services.FileService;
+import com.locke.babelrecords.services.MetaDataService;
+import com.locke.babelrecords.services.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -14,10 +17,8 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.List;
 
 @RestController()
@@ -29,10 +30,15 @@ import java.util.List;
 @RequestMapping("api/v1/files")
 public class FileController {
   private FileService fileService;
+  private UserService userService;
+
+  private MetaDataService metaDataService;
 
   @Autowired
-  public FileController(FileService fileService) {
+  public FileController(FileService fileService, UserService userService, MetaDataService metaDataService) {
     this.fileService = fileService;
+    this.userService = userService;
+    this.metaDataService = metaDataService;
   }
 
   @GetMapping("spec-files/user/{id}")
@@ -43,16 +49,19 @@ public class FileController {
 
   @GetMapping("parsed-files/user/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public List<ParsedFile> getUserParsedFiles(@PathVariable("id") String userId) {
-    return fileService.getUserParsedFiles(userId);
+  public List<ParsedFile> getUserParsedFiles(@PathVariable("id") String userId) throws ItemNotFoundException {
+    User user = userService.findById(userId);
+    return fileService.getUserParsedFiles(user.getParsedFileIds());
   }
 
   @PostMapping(value = "/spec-file/user/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
-  public ResponseEntity<?> postSpecFile(@PathVariable("id") String userId, @RequestPart("file") MultipartFile specFile, @RequestParam String specName) throws IOException, ItemAlreadyExistsException {
-    List<SpecField> parsedFile = fileService.parseSpecFile(specFile);
-    fileService.uploadSpecFile(userId, specName, parsedFile);
-    return new ResponseEntity<>(parsedFile, HttpStatus.CREATED);
+  public SpecFile postSpecFile(@PathVariable("id") String userId, @RequestPart("file") MultipartFile specFile, @RequestParam String specName) throws IOException, ItemAlreadyExistsException {
+    List<SpecField> parsedFields = fileService.parseSpecFile(specFile);
+    SpecFile savedSpec = fileService.uploadSpecFile(userId, specName, parsedFields);
+    userService.addSpecToUser(userId, savedSpec.getId());
+    metaDataService.CreateMetaTag(userId, "postSpec", specName, savedSpec.getId());
+    return savedSpec;
   }
 
 
@@ -64,8 +73,12 @@ public class FileController {
 
   @PostMapping("/flat-file/user/{id}")
   @ResponseStatus(HttpStatus.CREATED)
-  public void postFlatFile(@PathVariable("id") String userId, @RequestPart("file") MultipartFile flatFile, @RequestParam String flatFileName, @RequestParam String specFileId) throws ItemNotFoundException, IOException, ItemAlreadyExistsException {
-    fileService.uploadFlatFile(userId, flatFileName, flatFile, specFileId);
+  public ParsedFile postFlatFile(@PathVariable("id") String userId, @RequestPart("file") MultipartFile flatFile, @RequestParam String flatFileName, @RequestParam String specFileId) throws ItemNotFoundException, IOException, ItemAlreadyExistsException, ParseException {
+    ParsedFile parsedFile = fileService.uploadFlatFile(userId, flatFileName, flatFile, specFileId);
+    fileService.addParsedToSpec(specFileId, parsedFile);
+    userService.addParsedToUser(userId, parsedFile);
+    metaDataService.CreateMetaTag(userId, "postFlat", flatFileName, parsedFile.getId());
+    return parsedFile;
   }
 
   @GetMapping("flat-files/paths/user/{id}")

@@ -11,8 +11,6 @@ public class SpecField {
 
   private String dataType;
 
-  private String type;
-
   public SpecField() {
   }
 
@@ -52,14 +50,6 @@ public class SpecField {
 
   public void setDataType(String dataType) {
     this.dataType = dataType;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
   }
 
   @Override

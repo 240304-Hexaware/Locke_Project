@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SpecFileRepository extends MongoRepository<SpecFile, ObjectId> {
-    Optional<SpecFile> findById(String id);
-    Optional<SpecFile> findByName(String name);
-    List<SpecFile> findByUserId(String userId);
+public interface SpecFileRepository extends MongoRepository<SpecFile, String> {
+  Optional<SpecFile> findByName(String name);
+
+  List<SpecFile> findByUserId(String userId);
 }

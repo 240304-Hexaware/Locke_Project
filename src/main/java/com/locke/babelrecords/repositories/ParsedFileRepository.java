@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ParsedFileRepository extends MongoRepository<ParsedFile, ObjectId> {
-    Optional<ParsedFile> findById(String id);
-    Optional<ParsedFile> findByName(String name);
-    List<ParsedFile> findByUserId(String userId);
+public interface ParsedFileRepository extends MongoRepository<ParsedFile, String> {
+  Optional<ParsedFile> findById(String id);
+
+  Optional<ParsedFile> findByName(String name);
 }

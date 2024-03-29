@@ -1,10 +1,11 @@
 package com.locke.babelrecords.services;
 
 import com.locke.babelrecords.exceptions.*;
-import com.locke.babelrecords.models.FileField;
 import com.locke.babelrecords.models.ParsedFile;
+import com.locke.babelrecords.models.Record;
 import com.locke.babelrecords.models.User;
 import com.locke.babelrecords.repositories.ParsedFileRepository;
+import com.locke.babelrecords.repositories.RecordRepository;
 import com.locke.babelrecords.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,10 +19,13 @@ public class UserService {
   private UserRepository userRepository;
   private ParsedFileRepository parsedFileRepository;
 
+  private RecordRepository recordRepository;
+
   @Autowired
-  public UserService(UserRepository userRepository, ParsedFileRepository parsedFileRepository) {
+  public UserService(UserRepository userRepository, ParsedFileRepository parsedFileRepository, RecordRepository recordRepository) {
     this.userRepository = userRepository;
     this.parsedFileRepository = parsedFileRepository;
+    this.recordRepository = recordRepository;
   }
 
   public User findById(String id) throws ItemNotFoundException {
@@ -61,12 +65,22 @@ public class UserService {
     userRepository.deleteById(userId);
   }
 
-  public List<List<FileField>> getUserRecords(String userId) {
-    return parsedFileRepository.findByUserId(userId)
-        .stream() // Each parsed file has an array of records
-        .map(ParsedFile::getRecords) // Get all the arrays of records; gets one list of lists of records (which are lists)
-        .flatMap(List::stream) // Merge them into a List of records (which are lists)
-        .toList();
+  public List<Record> getUserRecords(String userId) {
+    User user = userRepository.findById(userId).orElseThrow();
+    return recordRepository.findAllById(user.getRecordIds());
+  }
+
+  public void addSpecToUser(String userId, String specFileId) {
+    User user = userRepository.findById(userId).orElseThrow();
+    user.addSpecFile(specFileId);
+    userRepository.save(user);
+  }
+
+  public void addParsedToUser(String userId, ParsedFile parsedFile) {
+    User user = userRepository.findById(userId).orElseThrow();
+    user.addParsedFile(parsedFile.getId());
+    user.addRecords(parsedFile.getRecordIds());
+    userRepository.save(user);
   }
 
   public void changeUserRole(String userId, String newRole) throws UserNotFoundException, InvalidRoleException {
