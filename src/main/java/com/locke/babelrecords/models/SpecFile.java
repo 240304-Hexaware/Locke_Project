@@ -1,12 +1,14 @@
 package com.locke.babelrecords.models;
 
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Document("specFiles")
@@ -28,6 +30,10 @@ public class SpecFile {
 
   @Field(name = "recordIds")
   private List<String> recordIds;
+
+  @Field
+  @CreatedDate
+  private Date createdAt;
 
   public SpecFile() {
   }

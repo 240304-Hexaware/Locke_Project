@@ -57,8 +57,7 @@ public class FileController {
   @PostMapping(value = "/spec-file/user/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   public SpecFile postSpecFile(@PathVariable("id") String userId, @RequestPart("file") MultipartFile specFile, @RequestParam String specName) throws IOException, ItemAlreadyExistsException {
-    List<SpecField> parsedFields = fileService.parseSpecFile(specFile);
-    SpecFile savedSpec = fileService.uploadSpecFile(userId, specName, parsedFields);
+    SpecFile savedSpec = fileService.uploadSpecFile(userId, specName, specFile);
     userService.addSpecToUser(userId, savedSpec.getId());
     metaDataService.CreateMetaTag(userId, "postSpec", specName, savedSpec.getId());
     return savedSpec;

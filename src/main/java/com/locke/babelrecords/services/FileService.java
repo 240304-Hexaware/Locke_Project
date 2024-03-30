@@ -104,8 +104,9 @@ public class FileService {
     return parsedFile;
   }
 
-  public SpecFile uploadSpecFile(String userId, String name, List<SpecField> parsedFields) throws ItemAlreadyExistsException {
+  public SpecFile uploadSpecFile(String userId, String name, MultipartFile specFile) throws ItemAlreadyExistsException, IOException {
     // Spec Files must be owned by a user and have a unique within said user's spec files
+    List<SpecField> parsedFields = parseSpecFile(specFile);
     List<SpecFile> userSpecs = specFileRepository.findByUserId(userId);
     if ( !userSpecs.stream().map(SpecFile::getName).toList().contains(name) ) {
       return this.specFileRepository.save(new SpecFile(userId, name, parsedFields));
