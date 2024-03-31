@@ -7,17 +7,18 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 
 @SpringBootApplication(scanBasePackages = {
-		"com.locke.babelrecords.controllers",
-		"com.locke.babelrecords.services",
-		"com.locke.babelrecords.repositories",
-		"com.locke.babelrecords.security"},
-		exclude = {DataSourceAutoConfiguration.class
-})
+    "com.locke.babelrecords.controllers",
+    "com.locke.babelrecords.services",
+    "com.locke.babelrecords.repositories",
+    "com.locke.babelrecords.security",
+    "com.locke.babelrecords.utils" },
+    exclude = { DataSourceAutoConfiguration.class
+    })
 @EnableMongoAuditing
 public class BabelrecordsApplication {
 
-	public static void main(String[] args) {
-		ApplicationContext ctx = SpringApplication.run(BabelrecordsApplication.class, args);
-	}
+  public static void main(String[] args) {
+    ApplicationContext ctx = SpringApplication.run(BabelrecordsApplication.class, args);
+  }
 
 }

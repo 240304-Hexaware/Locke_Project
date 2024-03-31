@@ -1,10 +1,8 @@
 package com.locke.babelrecords.controllers;
 
 import com.locke.babelrecords.exceptions.*;
-import com.locke.babelrecords.models.FileField;
-import com.locke.babelrecords.models.LoginToken;
+import com.locke.babelrecords.models.*;
 import com.locke.babelrecords.models.Record;
-import com.locke.babelrecords.models.User;
 import com.locke.babelrecords.services.AuthenticationService;
 import com.locke.babelrecords.services.UserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,6 +11,7 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -50,7 +49,7 @@ public class UserController {
   @GetMapping("/username/{username}")
   @ResponseStatus(HttpStatus.OK)
   public User getByUserName(@PathVariable String username) throws ItemNotFoundException {
-    return userService.findByUserName(username);
+    return (User) userService.loadUserByUsername(username);
   }
 
   @GetMapping("/id/{id}/records")
@@ -73,7 +72,7 @@ public class UserController {
 
   @PutMapping("/role/{id}/{role}")
   @ResponseStatus(HttpStatus.OK)
-  public void changeUserRole(@PathVariable("id") String userId, @PathVariable("role") String newRole) throws UserNotFoundException, InvalidRoleException {
+  public void changeUserRole(@PathVariable("id") String userId, @PathVariable("role") Role newRole) throws UserNotFoundException, InvalidRoleException {
     userService.changeUserRole(userId, newRole);
   }
 
@@ -83,11 +82,6 @@ public class UserController {
     return userService.findAll();
   }
 
-  @PostMapping("/register")
-  @ResponseStatus(HttpStatus.OK)
-  public User postUser(@RequestBody User user) throws UserAlreadyExists {
-    return userService.insertUser(new User(user.getUsername(), user.getPassword(), user.getRole()));
-  }
 
   @PostMapping("/login")
   @ResponseStatus(HttpStatus.OK)

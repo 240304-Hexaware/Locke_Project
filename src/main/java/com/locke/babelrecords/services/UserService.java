@@ -3,28 +3,31 @@ package com.locke.babelrecords.services;
 import com.locke.babelrecords.exceptions.*;
 import com.locke.babelrecords.models.ParsedFile;
 import com.locke.babelrecords.models.Record;
+import com.locke.babelrecords.models.Role;
 import com.locke.babelrecords.models.User;
-import com.locke.babelrecords.repositories.ParsedFileRepository;
 import com.locke.babelrecords.repositories.RecordRepository;
 import com.locke.babelrecords.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
   private UserRepository userRepository;
-  private ParsedFileRepository parsedFileRepository;
-
+  private PasswordEncoder passwordEncoder;
   private RecordRepository recordRepository;
 
   @Autowired
-  public UserService(UserRepository userRepository, ParsedFileRepository parsedFileRepository, RecordRepository recordRepository) {
+  public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RecordRepository recordRepository) {
     this.userRepository = userRepository;
-    this.parsedFileRepository = parsedFileRepository;
+    this.passwordEncoder = passwordEncoder;
     this.recordRepository = recordRepository;
   }
 
@@ -83,10 +86,15 @@ public class UserService {
     userRepository.save(user);
   }
 
-  public void changeUserRole(String userId, String newRole) throws UserNotFoundException, InvalidRoleException {
+  public void changeUserRole(String userId, Role newRole) throws UserNotFoundException, InvalidRoleException {
     User foundUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-    foundUser.setRole(newRole);
+    foundUser.AddRole(newRole);
 
     userRepository.save(foundUser);
+  }
+
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("username not found"));
   }
 }
