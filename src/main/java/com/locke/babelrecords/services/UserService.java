@@ -21,14 +21,15 @@ import java.util.Optional;
 @Service
 public class UserService implements UserDetailsService {
   private UserRepository userRepository;
-  private PasswordEncoder passwordEncoder;
   private RecordRepository recordRepository;
 
+  private PasswordEncoder passwordEncoder;
+
   @Autowired
-  public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RecordRepository recordRepository) {
+  public UserService(UserRepository userRepository, RecordRepository recordRepository, PasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
-    this.passwordEncoder = passwordEncoder;
     this.recordRepository = recordRepository;
+    this.passwordEncoder = passwordEncoder;
   }
 
   public User findById(String id) throws ItemNotFoundException {
@@ -43,23 +44,9 @@ public class UserService implements UserDetailsService {
     return userRepository.findAll();
   }
 
-  public User insertUser(User user) throws UserAlreadyExists {
-    Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
-    if ( existingUser.isPresent() ) {
-      throw new UserAlreadyExists();
-    }
-
-    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
-    String encodedPassword = encoder.encode(user.getPassword());
-    user.setPassword(encodedPassword);
-    return userRepository.save(user);
-  }
-
   public User updateUser(User updatedUser) throws UserNotFoundException {
     User prevUser = userRepository.findById(updatedUser.getId()).orElseThrow(UserNotFoundException::new);
-    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
-    String encodedPassword = encoder.encode(updatedUser.getPassword());
-    updatedUser.setPassword(encodedPassword);
+    updatedUser.setPassword(this.passwordEncoder.encode(updatedUser.getPassword()));
     userRepository.save(updatedUser);
     return prevUser;
   }

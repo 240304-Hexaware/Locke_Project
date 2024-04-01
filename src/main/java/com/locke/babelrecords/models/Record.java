@@ -35,6 +35,10 @@ public class Record {
     return id;
   }
 
+  public Map<String, Object> getFields() {
+    return this.fields;
+  }
+
   public void setId(String id) {
     this.id = id;
   }

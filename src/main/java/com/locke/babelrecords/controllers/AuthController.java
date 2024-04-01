@@ -7,7 +7,7 @@ import com.locke.babelrecords.models.Role;
 import com.locke.babelrecords.models.User;
 import com.locke.babelrecords.services.AuthenticationService;
 import com.locke.babelrecords.services.UserService;
-import jakarta.websocket.server.PathParam;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +36,11 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public LoginResponse login(@RequestBody RegistrationRecord data) throws AuthenticationException {
-    return this.authenticationService.login(data.username(), data.password());
+  @ResponseStatus(HttpStatus.OK)
+  public User login(@RequestBody RegistrationRecord data, HttpServletResponse response) throws AuthenticationException {
+    var result = this.authenticationService.login(data.username(), data.password());
+    response.addHeader("Authorization", "bearer " + result.jwt());
+    return result.user();
   }
 
   @PostMapping("/role/{role}")

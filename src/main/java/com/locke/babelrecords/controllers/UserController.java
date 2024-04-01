@@ -40,12 +40,6 @@ public class UserController {
     return userService.findById(id);
   }
 
-  @GetMapping("/tokens")
-  @ResponseStatus(HttpStatus.OK)
-  public List<LoginToken> getTokens() {
-    return authenticationService.getAllTokens();
-  }
-
   @GetMapping("/username/{username}")
   @ResponseStatus(HttpStatus.OK)
   public User getByUserName(@PathVariable String username) throws ItemNotFoundException {
@@ -69,30 +63,6 @@ public class UserController {
   public void deleteUser(@PathVariable("id") String userId) {
     userService.deleteUser(userId);
   }
-
-  @PutMapping("/role/{id}/{role}")
-  @ResponseStatus(HttpStatus.OK)
-  public void changeUserRole(@PathVariable("id") String userId, @PathVariable("role") Role newRole) throws UserNotFoundException, InvalidRoleException {
-    userService.changeUserRole(userId, newRole);
-  }
-
-  @GetMapping("")
-  @ResponseStatus(HttpStatus.OK)
-  public List<User> getAll() {
-    return userService.findAll();
-  }
-
-
-  @PostMapping("/login")
-  @ResponseStatus(HttpStatus.OK)
-  public User login(@RequestBody User user, HttpServletResponse response) throws ItemNotFoundException, InvalidPasswordException {
-    User foundUser = userService.findByUserName(user.getUsername());
-    String token = authenticationService.loginAndGetToken(foundUser, user.getPassword());
-    response.addHeader("AUTHORIZATION", "bearer " + token);
-
-    return foundUser;
-  }
-
 
   @ExceptionHandler(ItemNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)

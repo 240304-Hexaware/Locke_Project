@@ -26,6 +26,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -65,11 +67,15 @@ public class WebSecurityConfiguration {
     return http
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/v1/users/**").authenticated()
+            .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
             .requestMatchers("/api/v1/files/**").authenticated()
             .requestMatchers("api/v1/auth/**").permitAll()
         )
         .oauth2ResourceServer(oauth2 -> oauth2
-            .jwt(Customizer.withDefaults()))
+            .jwt(jwtConfigurer -> jwtConfigurer
+                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+            )
+        )
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .csrf(AbstractHttpConfigurer::disable)
         .cors(Customizer.withDefaults())
@@ -86,5 +92,15 @@ public class WebSecurityConfiguration {
     JWK jwk = new RSAKey.Builder(keys.getRsaPublicKey()).privateKey(keys.getRsaPrivateKey()).build();
     JWKSource<SecurityContext> jwkSource = new ImmutableJWKSet<>(new JWKSet(jwk));
     return new NimbusJwtEncoder(jwkSource);
+  }
+
+  @Bean
+  public JwtAuthenticationConverter jwtAuthenticationConverter() {
+    var jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+    jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+    jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+    var jwtConverter = new JwtAuthenticationConverter();
+    jwtConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+    return jwtConverter;
   }
 }
