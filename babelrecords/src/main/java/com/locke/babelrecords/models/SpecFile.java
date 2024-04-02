@@ -94,6 +94,22 @@ public class SpecFile {
     this.parsedFileIds.add(id);
   }
 
+  public void setParsedFileIds(List<String> parsedFileIds) {
+    this.parsedFileIds = parsedFileIds;
+  }
+
+  public void setRecordIds(List<String> recordIds) {
+    this.recordIds = recordIds;
+  }
+
+  public Date getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(Date createdAt) {
+    this.createdAt = createdAt;
+  }
+
   @Override
   public String toString() {
     return "SpecFile{" +

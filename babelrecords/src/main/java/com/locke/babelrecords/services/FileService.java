@@ -165,6 +165,10 @@ public class FileService {
     return new ByteArrayResource(Files.readAllBytes(path));
   }
 
+  public List<Record> findManyByIds(List<String> recordIds) {
+    return recordRepository.findAllById(recordIds);
+  }
+
   public SpecFile getSpecFileById(String id) throws ItemNotFoundException {
     return specFileRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Spec File Not Found."));
   }

@@ -2,13 +2,15 @@ package com.locke.babelrecords.controllers;
 
 import com.locke.babelrecords.exceptions.ItemAlreadyExistsException;
 import com.locke.babelrecords.exceptions.ItemNotFoundException;
+import com.locke.babelrecords.models.MetaTag;
 import com.locke.babelrecords.models.ParsedFile;
-import com.locke.babelrecords.models.SpecField;
+import com.locke.babelrecords.models.Record;
 import com.locke.babelrecords.models.SpecFile;
 import com.locke.babelrecords.models.User;
 import com.locke.babelrecords.services.FileService;
 import com.locke.babelrecords.services.MetaDataService;
 import com.locke.babelrecords.services.UserService;
+import jakarta.servlet.annotation.HttpConstraint;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -54,20 +56,19 @@ public class FileController {
     return fileService.getUserParsedFiles(user.getParsedFileIds());
   }
 
+  @GetMapping("/spec-files")
+  @ResponseStatus(HttpStatus.OK)
+  public List<SpecFile> getById() throws ItemNotFoundException {
+    return fileService.findAllSpecFiles();
+  }
+
   @PostMapping(value = "/spec-file/user/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   public SpecFile postSpecFile(@PathVariable("id") String userId, @RequestPart("file") MultipartFile specFile, @RequestParam String specName) throws IOException, ItemAlreadyExistsException {
     SpecFile savedSpec = fileService.uploadSpecFile(userId, specName, specFile);
     userService.addSpecToUser(userId, savedSpec.getId());
-    metaDataService.CreateMetaTag(userId, "postSpec", specName, savedSpec.getId());
+    metaDataService.createMetaTag(userId, "postSpec", specName, savedSpec.getId());
     return savedSpec;
-  }
-
-
-  @GetMapping("/spec-files")
-  @ResponseStatus(HttpStatus.OK)
-  public List<SpecFile> getById() throws ItemNotFoundException {
-    return fileService.findAllSpecFiles();
   }
 
   @PostMapping("/flat-file/user/{id}")
@@ -76,7 +77,7 @@ public class FileController {
     ParsedFile parsedFile = fileService.uploadFlatFile(userId, flatFileName, flatFile, specFileId);
     fileService.addParsedToSpec(specFileId, parsedFile);
     userService.addParsedToUser(userId, parsedFile);
-    metaDataService.CreateMetaTag(userId, "postFlat", flatFileName, parsedFile.getId());
+    metaDataService.createMetaTag(userId, "postFlat", flatFileName, parsedFile.getId(), parsedFile.getRecordIds());
     return parsedFile;
   }
 
@@ -96,6 +97,25 @@ public class FileController {
     return ResponseEntity.ok()
         .contentType(MediaType.APPLICATION_OCTET_STREAM)
         .body(data);
+  }
+
+  @GetMapping("records/many")
+  @ResponseStatus(HttpStatus.OK)
+  public List<Record> getManyById(@RequestBody List<String> recordIds) {
+    return this.fileService.findManyByIds(recordIds);
+  }
+
+  @GetMapping("history/{id}")
+  @ResponseStatus(HttpStatus.OK)
+  public List<MetaTag> getHistory(@PathVariable("id") String userId) {
+    return this.metaDataService.findByUserId(userId);
+  }
+
+  @GetMapping("history/last/{id}")
+  @ResponseStatus(HttpStatus.OK)
+  public MetaTag getLastHistory(@PathVariable("id") String userId) {
+    var result = this.metaDataService.findLastByUserId(userId);
+    return result.size() > 0 ? result.get(0) : null;
   }
 
   @ExceptionHandler(ItemAlreadyExistsException.class)

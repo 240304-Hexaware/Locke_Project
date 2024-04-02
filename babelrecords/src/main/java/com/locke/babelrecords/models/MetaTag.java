@@ -28,12 +28,7 @@ public class MetaTag {
   @Field
   private List<String> recordsCreated;
 
-  public MetaTag(String userId, String operation, String fileName, String fileId) {
-    this.userId = userId;
-    this.operation = operation;
-    this.fileName = fileName;
-    this.fileId = fileId;
-    this.recordsCreated = new ArrayList<>();
+  public MetaTag() {
   }
 
   public MetaTag(String userId, String operation, String fileName, String fileId, List<String> recordsCreated) {
@@ -44,6 +39,13 @@ public class MetaTag {
     this.recordsCreated = recordsCreated;
   }
 
+  public MetaTag(String userId, String operation, String fileName, String fileId) {
+    this.userId = userId;
+    this.operation = operation;
+    this.fileName = fileName;
+    this.fileId = fileId;
+    this.recordsCreated = new ArrayList<>();
+  }
 
   public String getUserId() {
     return userId;
@@ -63,5 +65,13 @@ public class MetaTag {
 
   public List<String> getRecordsCreated() {
     return recordsCreated;
+  }
+
+  public String getOperation() {
+    return operation;
+  }
+
+  public void setOperation(String operation) {
+    this.operation = operation;
   }
 }
