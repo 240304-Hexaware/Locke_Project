@@ -54,7 +54,7 @@ public class AuthenticationService {
     this.loginTokenRepository = loginTokenRepository;
   }
 
-  public User registerUser(String username, String password) throws UserAlreadyExists {
+  public LoginResponse registerUser(String username, String password) throws UserAlreadyExists {
     if ( userRepository.findByUsername(username).isPresent() ) throw new UserAlreadyExists();
 
     String encodedPassword = passwordEncoder.encode(password);
@@ -62,7 +62,10 @@ public class AuthenticationService {
     List<Role> roles = new ArrayList<>();
     roles.add(role);
 
-    return userRepository.save(new User(username, encodedPassword, roles));
+    var newUser = userRepository.save(new User(username, encodedPassword, roles));
+    var auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+    String token = tokenService.generateJwt(auth);
+    return new LoginResponse(userRepository.findByUsername(username).get(), token);
   }
 
   public LoginResponse login(String username, String password) throws AuthenticationException {

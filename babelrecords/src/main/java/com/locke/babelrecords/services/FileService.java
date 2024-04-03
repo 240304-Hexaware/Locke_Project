@@ -150,12 +150,14 @@ public class FileService {
     return parsedFileRepository.findAllById(userId);
   }
 
-  public List<String> getUserFilePaths(String userId) throws IOException {
+  public List<String> getUserFilePaths(String userId) {
     var files = new ArrayList<String>();
     try ( Stream<Path> paths = Files.walk(Paths.get(System.getProperty("user.dir"), "flatfiles", userId)) ) {
       paths
           .filter(Files::isRegularFile)
-          .forEach(path -> files.add(path.toString()));
+          .forEach(path -> files.add(path.getFileName().toString()));
+    } catch ( Exception e ) {
+      return new ArrayList<>();
     }
     return files;
   }

@@ -1,0 +1,17 @@
+<div class="w-full bg-zinc-800 text-white rounded m-4 p-4">
+    <div class="w-full text-lg text-white m-4 p-4" *ngIf="filesService.hasParsed == false; else recTitle">
+        <p class="text-center">There are no parsed files associated with this account.</p>
+    </div>
+    <ng-template class="w-full text-lg text-white m-4 p-4" #recTitle>
+        <p class="w-full text-center">{{userDataService.username}}`s Parsed Files</p>
+    </ng-template>
+    <div class="grid grid-cols-4 my-2"
+    *ngFor="let parsed of filesService.parsed"
+    (click)="showParsed(parsed.id)">
+        <p class="p-2 text-lg hover:cursor-default">{{parsed.name}}</p>
+        <p class="p-2 text-lg hover:cursor-default">{{parsed.createdAt.split('T')[0]}}</p>
+        <p class="p-2 text-lg hover:cursor-default">{{parsed.recordIds.length}} Records</p>
+        <a [routerLink]="['/records']" (click)="setFilterCriteria(parsed.recordIds)"
+        class="p-2 text-lg bg-green-800 text-white cursor-pointer">Go to Records</a>
+    </div>
+</div>

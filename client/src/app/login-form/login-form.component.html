@@ -1,0 +1,41 @@
+<div class="flex flex-col items-center">
+<div class="bg-white shadow-md m-4 p-4 rounded max-w-lg">
+    <p>Welcome to Babel Records!
+        Please login to access this app's functionality.
+        If your paygrade is higher than mine and are here to judge me, you can
+        use this credentials: 
+    </p>
+    <p class="text-xl font-bold">Username: Timmy</p>
+    <p class="text-xl font-bold">Password:  lunchmoney</p>
+</div>
+<div class="w-full max-w-xs mx-auto my-10">
+    <form class="bg-zinc-800 text-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+    [formGroup]="userData" (ngSubmit)="onSubmit()">
+        <div class="mb-4">
+            <label class="block font-bold mb-2" for="username">Username</label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username"
+            type="text" formControlName="username">
+        </div>
+        <div class="mb-6">
+            <label class="block font-bold mb-2" for="password">Password</label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none" id="password" placeholder="Password"
+            type="password" formControlName="password">
+        </div>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative m-2" role="alert"
+        *ngIf="username && username.invalid && (username.dirty || username.touched)">
+            <p *ngIf="username.errors!['required']">Username is required.</p>
+        </div>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative m-2" role="alert"
+        *ngIf="password && password.invalid && (password.dirty || password.touched)">
+            <p *ngIf="password.errors!['required']">Password is required.</p>
+            <p *ngIf="password.errors!['minlength']">Password must be over 6 characters long.</p>
+        </div>
+        <div class="flex items-center justify-center">
+            <button class="bg-green-800 text-white font-bold py-2 px-4 rounded focus:outline-none" type="submit">
+                <p *ngIf="reqInfoService.loggingIn == false">Sign In</p>
+                <p *ngIf="reqInfoService.loggingIn">Please Wait</p>
+            </button>
+        </div>
+    </form>
+</div> 
+</div>

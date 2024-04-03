@@ -1,0 +1,27 @@
+<div  class="absolute inset-0 w-4/5 h-4/5 m-auto flex flex-col items-center justify-between bg-zinc-800 rounded text-white p-4"
+*ngIf="filesService.showRawFile">
+    <div class="w-full flex flex-col"
+    *ngIf="filesService.rawType == 'Spec'; else parsed">
+        <div class="w-full flex justify-around">
+            <p class="text-lg m-2">{{rawSpec?.name}}</p>
+            <p class="text-lg m-2">{{rawSpec?.createdAt!.split("T")[0]}}</p>
+        </div>
+        <div class="w-full max-h-[34em] overflow-auto no-scrollbar">
+            <pre class="w-full bg-zinc-600 rounded">
+                {{rawSpecJSON}}
+            </pre>
+        </div>
+    </div>
+    <ng-template #parsed>
+        <div class="w-full flex justify-around">
+            <p class="text-lg m-2">{{rawParsed?.name}}</p>
+            <p class="text-lg m-2">{{rawParsed?.createdAt!.split("T")[0]}}</p>
+        </div>
+        <div class="w-full overflow-y-scroll no-scrollbar">
+            <pre class="bg-zinc-600 rounded">
+                {{rawParsedJSON}}
+            </pre>
+        </div>
+    </ng-template>
+    <button (click)="close()" class="bg-green-800 rounded min-w-36 m-2 p-4 text-lg hover:cursor-pointer">Close</button>
+</div>

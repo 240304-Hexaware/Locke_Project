@@ -31,8 +31,10 @@ public class AuthController {
 
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.OK)
-  public User postUser(@RequestBody RegistrationRecord data) throws UserAlreadyExists {
-    return this.authenticationService.registerUser(data.username(), data.password());
+  public User postUser(@RequestBody RegistrationRecord data, HttpServletResponse response) throws UserAlreadyExists {
+    var result = this.authenticationService.registerUser(data.username(), data.password());
+    response.addHeader("Authorization", "bearer " + result.jwt());
+    return result.user();
   }
 
   @PostMapping("/login")

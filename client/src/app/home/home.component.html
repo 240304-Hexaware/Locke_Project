@@ -1,0 +1,56 @@
+<main class="flex flex-1 flex-col items-center justify-between">
+    <div class="w-full flex m-4 p-4">
+        <div class="flex flex-col bg-zinc-800 text-white m-4 p-4 rounded shadow-md">
+            <p class="text-xl">Welcome back,</p>
+            <p class="text-3xl mb-4 self-center">{{userDataService.username}}</p>
+            <p>You have been an user since {{userDataService.createdAt}}</p>
+        </div>
+        <div class="bg-zinc-800 flex grow flex-col items-center m-4 p-4 rounded shadow-md">
+            <button class="block bg-green-900 text-white rounded my-2 p-4 w-full max-w-lg hover:cursor-pointer"
+            (click)="specUpload.click()"
+            >Upload Spec File</button>
+            <input type="file" class="hidden" (change)="onSpecFileSelect($event)" #specUpload>
+            <div class="flex justify-between bg-green-900 text-white items-center rounded my-2 p-4 w-full max-w-lg hover:cursor-pointer"
+            [ngClass]="specFileId == '' ? 'pointer-events-none': 'pointer-events-auto'"
+            (click)="flatUpload.click()">
+                <p>Upload Flat File</p>
+                    <select class="p-2 rounded bg-purple-600 hover:cursor-pointer pointer-events-auto" [(ngModel)]="specFileId" onclick='event.stopPropagation()'>
+                        <option *ngIf="userDataService.hasSpecs == false" value="">Please upload a spec file first</option>
+                        <option *ngIf="userDataService.hasSpecs" value="">Choose a spec file</option>
+                        <option *ngFor="let spec of filesService.specs" 
+                        value={{spec.id}}>{{spec.name}}</option>
+                    </select>
+            </div>
+            <input type="file" class="hidden" (change)="onFlatFileSelect($event)" #flatUpload>
+        </div>
+    </div>
+    <div class="w-full max-w-lg bg-zinc-800 text-white m-4 p-4 rounded">
+        <div class="flex flex-row justify-between border-b border-green-800"><p class="text-lg py-2">Current Number of Spec Files</p> <p class="text-lg py-2">{{userDataService.specs.length}}</p></div>
+        <div class="flex flex-row justify-between border-b border-green-800"><p class="text-lg py-2">Current Number of Flat Files</p> <p class="text-lg py-2">{{userDataService.parsed.length}}</p></div>
+        <div class="flex flex-row justify-between border-b border-green-800"><p class="text-lg py-2">Current Number of Records</p> <p class="text-lg py-2">{{userDataService.records.length}}</p></div>
+        <div *ngIf="userDataService.history != null; else NoHistory" class="bg-zinc-800 text-white m-4 p-4 rounded">
+            <p class="w-full">Last Operation</p>
+            <p class="w-full text-right">{{userDataService.history.createdAt.split('T')[0]}}</p>
+            <div (click)="seeLastUpload()"
+            class="w-full flex justify-between border border-green-800 rounded m-4 p-4 hover:cursor-pointer">
+                <div>
+                    <p class="text-lg">Operation: {{userDataService.history.operation == 'postSpec' ? "Spec File Upload" : "Flat File Upload"}}</p>
+                    <p class="text-lg">Filename: {{userDataService.history.fileName}}</p>
+                </div>
+                <div *ngIf="userDataService.history.operation == 'postFlat'" class="flex flex-col justify-center">
+                    <p class="text-center">Filename: {{userDataService.history.fileName}}</p>
+                    <button class="bg-green-800 rounded p-2"
+                    (click)="onDownloadLatest(userDataService.history.fileName)"
+                    >Download</button>
+                </div>
+                
+            </div>
+        </div>
+        <ng-template #NoHistory>
+            <div class="border border-green-800 rounded m-4 p-4">
+                <p class="text-lg text-center">You haven't uploaded any files yet.</p>
+            </div>
+        </ng-template>
+    </div>
+
+</main>

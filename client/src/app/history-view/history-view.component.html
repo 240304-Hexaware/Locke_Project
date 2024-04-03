@@ -1,0 +1,11 @@
+<div class="bg-zinc-800 m-4 p-4 rounded">
+    <div class="grid grid-cols-4 text-lg text-white"
+    *ngFor="let tag of userDataService.allHistory">
+        <p class="text-center m-2">{{tag.fileName}}</p>
+        <p class="text-center m-2">{{tag.operation == 'postSpec' ? "Spec File Upload" : "Flat File Upload"}}</p>
+        <p class="text-center m-2">{{tag.createdAt.split("T")[0]}}</p>
+        <p class="text-center m-2"
+        *ngIf="tag.operation == 'postFlat'"
+        >{{tag.recordsCreated.length}} Records Created</p>
+    </div>
+</div>

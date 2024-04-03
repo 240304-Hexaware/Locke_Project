@@ -1,0 +1,23 @@
+<div class="w-full bg-zinc-800 text-white m-4 p-4">
+    <div class="w-full text-lg text-white m-4 p-4" *ngIf="filesService.hasSpecs == false; else recTitle">
+        <p class="text-lg">There are no spec files associated with this account.</p>
+    </div>
+    <ng-template class="w-full text-lg text-white m-4 p-4" #recTitle>
+        <p class="w-full text-center">{{userDataService.username}}`s Spec Files</p>
+    </ng-template>
+    <div *ngFor="let spec of filesService.specs"
+    (click)="showSpec(spec.id)"
+     class="w-full grid grid-cols-6 mb-2 hover:cursor-pointer">
+        <p class="p-2 text-lg text-center">{{spec.name}}</p>
+        <p class="p-2 text-lg text-center">{{spec.fields.length}} Fields</p>
+        <p class="p-2 text-lg text-center">{{spec.parsedFileIds.length}} Parsed Files</p>
+        <p class="p-2 text-lg text-center">{{spec.recordIds.length}} Records</p>
+        <p class="p-2 text-lg text-center">{{spec.createdAt.split('T')[0]}}</p>
+        <a [routerLink]="['/records']"
+            class="bg-green-800 p-2 text-lg text-center" 
+            (click)="setFilterCriteria(spec.recordIds)"
+            >
+            Go to Records    
+        </a>
+    </div>
+</div>
