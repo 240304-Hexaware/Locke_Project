@@ -1,1 +1,11 @@
-<p>filters works!</p>
+<div class="flex">
+    <select class="mx-4 p-4 bg-green-800 rounded text-white"
+     name="specs" [ngModel]="specId" (ngModelChange)="specChange($event)">
+        <option value="">None</option>
+        <option *ngFor="let spec of filesService.specs"
+        value={{spec.id}}>{{spec.name}}</option>
+    </select>
+    <button class="mx-4 p-4 bg-green-800 rounded text-white"
+    (click)="resetFilters()"
+    >Reset Filters</button>
+</div>

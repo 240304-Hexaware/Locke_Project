@@ -1,7 +1,7 @@
 package com.locke.babelrecords.controllers;
 
+import com.locke.babelrecords.exceptions.RolesNotSetupException;
 import com.locke.babelrecords.exceptions.UserAlreadyExists;
-import com.locke.babelrecords.models.LoginResponse;
 import com.locke.babelrecords.models.RegistrationRecord;
 import com.locke.babelrecords.models.Role;
 import com.locke.babelrecords.models.User;
@@ -31,7 +31,7 @@ public class AuthController {
 
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.OK)
-  public User postUser(@RequestBody RegistrationRecord data, HttpServletResponse response) throws UserAlreadyExists {
+  public User postUser(@RequestBody RegistrationRecord data, HttpServletResponse response) throws UserAlreadyExists, RolesNotSetupException {
     var result = this.authenticationService.registerUser(data.username(), data.password());
     response.addHeader("Authorization", "bearer " + result.jwt());
     return result.user();
@@ -39,7 +39,7 @@ public class AuthController {
 
   @PostMapping("/login")
   @ResponseStatus(HttpStatus.OK)
-  public User login(@RequestBody RegistrationRecord data, HttpServletResponse response) throws AuthenticationException {
+  public User login(@RequestBody RegistrationRecord data, HttpServletResponse response) {
     var result = this.authenticationService.login(data.username(), data.password());
     response.addHeader("Authorization", "bearer " + result.jwt());
     return result.user();

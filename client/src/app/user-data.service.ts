@@ -30,6 +30,7 @@ export class UserDataService {
   lastHistory: MetaTag | null = null
   userHistory: MetaTag[] = []
   jwtToken: string | null = null
+  loggedOut = true
 
   constructor(private http: HttpClient, private router: Router, filesService: FilesService, reqInfoService: ReqInfoService) {
     this.userData = {id: "", username: "", role: [], createdAt: null, specFileIds: [], parsedFileIds: [], recordIds: []}
@@ -53,6 +54,7 @@ export class UserDataService {
         this.filesService.getRecords()
         this.filesService.getSpecs()
         this.getLastHistory()
+        this.loggedOut = false
 
         this.router.navigate(['home'])
       }
@@ -79,6 +81,7 @@ export class UserDataService {
           this.filesService.getRecords()
           this.filesService.getSpecs()
           this.getLastHistory()
+          this.loggedOut = false
 
           this.router.navigate(['home'])
         }
@@ -99,6 +102,7 @@ export class UserDataService {
     this.reqInfoService.logInSucceeded()
     this.userData = {id: "", username: "", role: [], createdAt: null, specFileIds: [], parsedFileIds: [], recordIds: []}
     this.jwtToken = null
+    this.loggedOut == true
   }
 
   public getLastHistory() {

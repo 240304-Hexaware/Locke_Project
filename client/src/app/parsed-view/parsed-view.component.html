@@ -3,7 +3,7 @@
         <p class="text-center">There are no parsed files associated with this account.</p>
     </div>
     <ng-template class="w-full text-lg text-white m-4 p-4" #recTitle>
-        <p class="w-full text-center">{{userDataService.username}}`s Parsed Files</p>
+        <p class="w-full text-center font-bold">{{userDataService.username}}'s Parsed Files</p>
     </ng-template>
     <div class="grid grid-cols-4 my-2"
     *ngFor="let parsed of filesService.parsed"

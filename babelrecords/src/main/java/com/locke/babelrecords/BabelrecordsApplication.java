@@ -18,7 +18,7 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 public class BabelrecordsApplication {
 
   public static void main(String[] args) {
-    ApplicationContext ctx = SpringApplication.run(BabelrecordsApplication.class, args);
+    SpringApplication.run(BabelrecordsApplication.class, args);
   }
 
 }

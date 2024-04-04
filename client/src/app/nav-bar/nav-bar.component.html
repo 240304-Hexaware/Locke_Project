@@ -7,34 +7,34 @@
     </div>
     <div class="w-full block flex-grow lg:flex lg:items-center lg:w-auto"
     *ngIf="userDataService.hasUser()">
-        <div *ngIf="userDataService.isAdmin() == false; else adminNav" class="lg:flex-grow">
-            <a class="block mt-4 lg:inline-block lg-mt-0 text-lg text-teal-200 hover:text-white hover:cursor-pointer mr-4"
+        <div *ngIf="userDataService.isAdmin() == false; else adminNav" class="lg:flex-grow flex flex-row justify-center items-center flex-wrap">
+            <a class="block lg:inline-block lg-mt-0 text-lg text-white hover:underline hover:cursor-pointer mr-4"
             routerLink="home"
             >Home</a>
-            <a class="block mt-4 lg:inline-block lg:mt-0 text-lg text-teal-200 hover:text-white hover:cursor-pointer mr-4"
+            <a class="block lg:inline-block lg:mt-0 text-lg text-white hover:underline hover:cursor-pointer mr-4"
             routerLink="records"
             >Records</a>
-            <a class="block mt-4 lg:inline-block lg:mt-0 text-lg text-teal-200 hover:text-white hover:cursor-pointer mr-4"
+            <a class="block lg:inline-block lg:mt-0 text-lg text-white hover:underline hover:cursor-pointer mr-4"
             routerLink="specs"
             >Spec Files</a>
-            <a class="block mt-4 lg:inline-block lg:mt-0 text-lg text-teal-200 hover:text-white hover:cursor-pointer mr-4"
+            <a class="block lg:inline-block lg:mt-0 text-lg text-white hover:underline hover:cursor-pointer mr-4"
             routerLink="parsed"
             >Parsed Files</a>
-            <a class="block mt-4 lg:inline-block lg:mt-0 text-lg text-teal-200 hover:text-white hover:cursor-pointer mr-4"
+            <a class="block lg:inline-block lg:mt-0 text-lg text-white hover:underline hover:cursor-pointer mr-4"
             routerLink="flat"
             >Flat Files</a>
-            <a class="block mt-4 lg:inline-block lg:mt-0 text-lg text-teal-200 hover:text-white hover:cursor-pointer mr-4"
+            <a class="block lg:inline-block lg:mt-0 text-lg text-white hover:underline hover:cursor-pointer mr-4"
             routerLink="history"
             >History</a>
         </div>
         <ng-template #adminNav>
-            <a class="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white hover:cursor-pointer mr-4"
+            <a class="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white hover:cursor-pointer mr-4"
             routerLink="users">Users</a>
         </ng-template>
     </div>
     <div class="flex flex-row items-center"
     *ngIf="userDataService.hasUser(); else noUser">
-        <h4 class="text-white text-xl mr-4"
+        <h4 class="text-white text-xl mr-4 invisible md:visible"
         >{{userDataService.username}}</h4>
         <a class="flex justify-center items-center text-md px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white hover:cursor-pointer mt-4 lg:mt-0"
         (click)="userDataService.logout()"

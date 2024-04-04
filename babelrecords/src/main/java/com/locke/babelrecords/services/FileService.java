@@ -10,6 +10,7 @@ import com.locke.babelrecords.models.Record;
 import com.locke.babelrecords.repositories.ParsedFileRepository;
 import com.locke.babelrecords.repositories.RecordRepository;
 import com.locke.babelrecords.repositories.SpecFileRepository;
+import com.locke.babelrecords.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
@@ -31,14 +32,16 @@ import java.util.stream.Stream;
 public class FileService {
   private final SpecFileRepository specFileRepository;
   private final ParsedFileRepository parsedFileRepository;
-
   private final RecordRepository recordRepository;
 
+  private final UserRepository userRepository;
+
   @Autowired
-  public FileService(SpecFileRepository specFileRepository, ParsedFileRepository parsedFileRepository, RecordRepository recordRepository) {
+  public FileService(SpecFileRepository specFileRepository, ParsedFileRepository parsedFileRepository, RecordRepository recordRepository, UserRepository userRepository) {
     this.specFileRepository = specFileRepository;
     this.parsedFileRepository = parsedFileRepository;
     this.recordRepository = recordRepository;
+    this.userRepository = userRepository;
   }
 
   public List<SpecField> parseSpecFile(MultipartFile specFile) throws IOException {
@@ -89,7 +92,7 @@ public class FileService {
               throw new RuntimeException(e);
             }
           }
-          case "Time" -> Duration.ofSeconds(Integer.parseInt(value)).toMinutes();
+          case "Time" -> String.valueOf(Integer.parseInt(value) / 60 + ":" + Integer.parseInt(value) % 60);
           default -> value;
         });
       });
@@ -122,9 +125,11 @@ public class FileService {
       throw new IOException("Could not write file to disk");
     }
 
-    Optional<ParsedFile> sameNameParsed = parsedFileRepository.findByName(name);
+    User user = userRepository.findById(userId).get();
+    List<ParsedFile> userParsed = parsedFileRepository.findAllById(user.getParsedFileIds());
+
     try {
-      if ( sameNameParsed.isEmpty() || !sameNameParsed.get().getId().equals(userId) ) {
+      if ( userParsed.isEmpty() || userParsed.stream().noneMatch(parsedFile -> parsedFile.getName().equals(name)) ) {
         var specFile = specFileRepository.findById(specFileId).orElseThrow();
         var parsedFile = buildParsedFile(file, specFile.getFields(), userId, specFile.getId(), name);
 

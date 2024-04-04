@@ -2,8 +2,8 @@
     <div class="w-full text-lg text-white m-4 p-4" *ngIf="filesService.hasSpecs == false; else recTitle">
         <p class="text-lg">There are no spec files associated with this account.</p>
     </div>
-    <ng-template class="w-full text-lg text-white m-4 p-4" #recTitle>
-        <p class="w-full text-center">{{userDataService.username}}`s Spec Files</p>
+    <ng-template class="w-full" #recTitle>
+        <p class="w-full text-lg text-white m-4 p-4 text-center font-bold">{{userDataService.username}}'s Spec Files</p>
     </ng-template>
     <div *ngFor="let spec of filesService.specs"
     (click)="showSpec(spec.id)"

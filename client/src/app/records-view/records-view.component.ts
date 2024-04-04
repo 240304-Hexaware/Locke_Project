@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { UserDataService } from '../user-data.service';
 import { NgFor, NgIf } from '@angular/common';
 import { FilesService } from '../files.service';
+import { FiltersComponent } from '../filters/filters.component';
 
 @Component({
   selector: 'app-records-view',
   standalone: true,
-  imports: [NgFor, NgIf],
+  imports: [NgFor, NgIf, FiltersComponent],
   templateUrl: './records-view.component.html',
   styleUrl: './records-view.component.css'
 })
@@ -23,6 +24,7 @@ export class RecordsViewComponent {
   }
 
   onSelectTag(tag: any) {
-    console.log(this.filesService.filterRecords(tag[0], tag[1]))
+    this.filesService.recordFilters.push({name: tag[0], values: tag[1]})
+    this.filesService.filteredRecords = this.filesService.applyFilters()
   }
 }

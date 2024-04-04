@@ -26,7 +26,7 @@ export class ReqInfoService {
   logIn() {this.info.set("loggingIn", true)}
 
   logInSucceeded() {
-    this.info.set("loggingiIn", false)
+    this.info.set("loggingIn", false)
   }
 
   get loginFailed() { return this.info.get("loginFailed")}

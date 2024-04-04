@@ -31,10 +31,10 @@ import java.util.List;
 )
 @RequestMapping("api/v1/files")
 public class FileController {
-  private FileService fileService;
-  private UserService userService;
+  private final FileService fileService;
+  private final UserService userService;
 
-  private MetaDataService metaDataService;
+  private final MetaDataService metaDataService;
 
   @Autowired
   public FileController(FileService fileService, UserService userService, MetaDataService metaDataService) {
@@ -58,7 +58,7 @@ public class FileController {
 
   @GetMapping("/spec-files")
   @ResponseStatus(HttpStatus.OK)
-  public List<SpecFile> getById() throws ItemNotFoundException {
+  public List<SpecFile> getById() {
     return fileService.findAllSpecFiles();
   }
 
@@ -115,7 +115,7 @@ public class FileController {
   @ResponseStatus(HttpStatus.OK)
   public MetaTag getLastHistory(@PathVariable("id") String userId) {
     var result = this.metaDataService.findLastByUserId(userId);
-    return result.size() > 0 ? result.get(0) : null;
+    return !result.isEmpty() ? result.get(0) : null;
   }
 
   @ExceptionHandler(ItemAlreadyExistsException.class)

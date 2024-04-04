@@ -17,6 +17,7 @@ export class FilesService {
   userRecords: Record[] | [] = []
   flatFiles: string[] = []
   recordFilters: UserFilter[] = []
+  filteredRecords: Record[] = []
 
   rawFile: Parsed | Spec | null = null
   rawType: "Parsed" | "Spec" | null = null
@@ -110,11 +111,19 @@ export class FilesService {
     return this.userParsed
   }
 
-  get records() {
-    return this.recordFilters.length > 0 ? this.userRecords.filter( record => 
+  applyFilters() {
+    return this.recordFilters.length > 0 ? 
+    this.userRecords.filter( record => 
       this.recordFilters.some(filter =>
-        filter.name == "id" ? filter.values.includes(record.id) : filter.values.includes(record.fields[filter.name])))
+        filter.name == "id" ? (filter.values.length != 0 && filter.values.includes(record.id)) 
+        : filter.values.includes(record.fields[filter.name])
+      )
+    )
     : this.userRecords
+  }
+
+  get records() {
+    return this.filteredRecords.length > 0 ? this.filteredRecords : this.userRecords
   }
 
   get hasRecords() {

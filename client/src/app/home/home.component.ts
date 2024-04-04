@@ -35,20 +35,9 @@ export class HomeComponent {
       if(res.status == 201) {
         this.userDataService.getUserData()
         this.userDataService.getLastHistory()
+        this.filesService.getSpecs()
       }
     }})
-  }
-
-  onUploadAttempt() {
-    if (this.specFileId == "") {
-      
-    }
-  }
-
-  flatUploadClick() {
-    if(this.specFileId != "") {
-
-    }
   }
 
   onFlatFileSelect(event: any) {
@@ -59,6 +48,7 @@ export class HomeComponent {
         if(res.status == 201) {
           this.userDataService.getUserData()
           this.userDataService.getLastHistory()
+          this.filesService.getParsedFiles()
         }
       }})
     } else {
@@ -72,11 +62,11 @@ export class HomeComponent {
 
   seeLastUpload() {
     if(this.userDataService.history?.operation == "postSpec") {
-      this.filesService.show = true
       this.filesService.setRawFile("Spec", this.userDataService.history.fileId)
-    } else {
       this.filesService.show = true
+    } else {
       this.filesService.setRawFile("Parsed", this.userDataService.history!.fileId)
+      this.filesService.show = true
     }
   }
   

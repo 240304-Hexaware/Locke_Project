@@ -12,7 +12,7 @@ export const notificationsInterceptor: HttpInterceptorFn = (req, next) => {
         reqInfoService.fileAlreadyExists()
       }
 
-      if (err.status === 404) {
+      if (err.status === 401) {
         reqInfoService.failLogin()
       }
 

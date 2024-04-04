@@ -1,11 +1,14 @@
-<div class="w-full bg-zinc-800 flex flex-wrap m-4 p-4">
-    <div class="w-full text-lg text-white m-4 p-4" *ngIf="filesService.hasRecords == false; else recTitle">
+<div class="w-full flex flex-wrap justify-center my-4 p-4">
+    <div class="w-full bg-zinc-800 text-lg text-white m-4 p-4 rounded" *ngIf="filesService.hasRecords == false; else recTitle">
         <p class="text-lg">There are no records associated with this account.</p>
     </div>
-    <ng-template class="w-full text-lg text-white m-4 p-4" #recTitle>
-        <p class="w-full text-center">{{userDataService.username}}`s Records</p>
+    <ng-template #recTitle>
+        <div class="w-full bg-zinc-800 m-4 p-4">
+            <p class=" text-lg text-white text-center font-bold">{{userDataService.username}}'s Records</p>
+            <app-filters></app-filters>
+        </div>
     </ng-template>
-    <div class="text-white flex flex-row w-96 m-4 rounded overflow-hidden shadow-lg"
+    <div class="bg-zinc-800 text-white flex flex-row w-96 m-4 rounded overflow-hidden shadow-lg"
     *ngFor="let record of filesService.records">
         <div class="flex flex-col">
             <div class="px-6 py-4">

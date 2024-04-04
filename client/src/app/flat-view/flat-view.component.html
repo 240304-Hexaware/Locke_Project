@@ -3,7 +3,7 @@
         <p class="text-center">There are no flat files associated with this account.</p>
     </div>
     <ng-template class="w-full text-lg text-white m-4 p-4" #recTitle>
-        <p class="w-full text-center">{{userDataService.username}}`s Flat Files</p>
+        <p class="w-full text-center font-bold">{{userDataService.username}}'s Flat Files</p>
     </ng-template>
     <div *ngFor="let flat of filesService.flatFiles"
      class="w-full grid grid-cols-2 mb-2">

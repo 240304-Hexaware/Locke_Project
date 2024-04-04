@@ -14,7 +14,7 @@
             [ngClass]="specFileId == '' ? 'pointer-events-none': 'pointer-events-auto'"
             (click)="flatUpload.click()">
                 <p>Upload Flat File</p>
-                    <select class="p-2 rounded bg-purple-600 hover:cursor-pointer pointer-events-auto" [(ngModel)]="specFileId" onclick='event.stopPropagation()'>
+                    <select class="p-2 rounded bg-yellow-600 hover:cursor-pointer pointer-events-auto" [(ngModel)]="specFileId" onclick='event.stopPropagation()'>
                         <option *ngIf="userDataService.hasSpecs == false" value="">Please upload a spec file first</option>
                         <option *ngIf="userDataService.hasSpecs" value="">Choose a spec file</option>
                         <option *ngFor="let spec of filesService.specs" 
@@ -39,7 +39,7 @@
                 </div>
                 <div *ngIf="userDataService.history.operation == 'postFlat'" class="flex flex-col justify-center">
                     <p class="text-center">Filename: {{userDataService.history.fileName}}</p>
-                    <button class="bg-green-800 rounded p-2"
+                    <button class="bg-green-800 rounded p-2" onclick="event.stopPropagation()"
                     (click)="onDownloadLatest(userDataService.history.fileName)"
                     >Download</button>
                 </div>

@@ -11,12 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -73,9 +71,9 @@ public class UserService implements UserDetailsService {
     userRepository.save(user);
   }
 
-  public void changeUserRole(String userId, Role newRole) throws UserNotFoundException, InvalidRoleException {
+  public void changeUserRole(String userId, Role newRole) throws UserNotFoundException {
     User foundUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-    foundUser.AddRole(newRole);
+    foundUser.addRole(newRole);
 
     userRepository.save(foundUser);
   }

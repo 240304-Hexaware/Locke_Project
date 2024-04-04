@@ -120,7 +120,7 @@ public class User implements UserDetails {
     return roles;
   }
 
-  public void AddRole(Role role) {
+  public void addRole(Role role) {
     this.roles.add(role);
   }
 
@@ -155,15 +155,6 @@ public class User implements UserDetails {
   public void addRecords(List<String> records) {
     this.recordIds.addAll(records);
   }
-
-//  public void setRole(String role) throws InvalidRoleException {
-//    if ( !role.equalsIgnoreCase("admin") && !role.equalsIgnoreCase("user") ) {
-//      throw new InvalidRoleException();
-//    }
-//
-//    this.role = role.toLowerCase();
-//  }
-
 
   @Override
   public String toString() {
