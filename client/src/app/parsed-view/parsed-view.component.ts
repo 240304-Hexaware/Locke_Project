@@ -27,6 +27,7 @@ export class ParsedViewComponent {
   }
 
   setFilterCriteria(ids: string[]) {
-    this.filesService.filterCriteria = [{name: "id", values: ids}]
+    this.filesService.recordFilters = [{name: "id", values: ids}]
+    this.filesService.filteredRecords = this.filesService.applyFilters()
   }
 }

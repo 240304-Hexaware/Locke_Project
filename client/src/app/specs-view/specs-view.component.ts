@@ -31,7 +31,8 @@ export class SpecsViewComponent {
   }
   
   setFilterCriteria(recordIds: string[]) {
-    this.filesService.filterCriteria = [{name: "id", values: recordIds}]
+    this.filesService.recordFilters = [{name: "id", values: recordIds}]
+    this.filesService.filteredRecords = this.filesService.applyFilters()
   }
 
 }

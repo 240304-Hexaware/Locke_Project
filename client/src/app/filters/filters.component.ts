@@ -25,7 +25,7 @@ export class FiltersComponent {
       this.filesService.recordFilters.push({"name": "id", 
         values: this.filesService.specs.find(x => x.id == id)?.recordIds!
       })
-
+      console.log(this.filesService.recordFilters)
       this.filesService.filteredRecords = this.filesService.applyFilters()
     } else {
       this.filesService.filterCriteria = this.filesService.recordFilters.filter(filter => filter.name != "id")
